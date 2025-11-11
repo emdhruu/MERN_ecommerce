@@ -20,7 +20,7 @@ const generateOtp = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-export const registerUser = async (req: Request, res: Response) => {
+const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
 
@@ -35,7 +35,6 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     const existingUser = await User.findOne({ email });
-    console.log(existingUser);
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
@@ -72,7 +71,7 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-export const verifyOtp = async (req: Request, res: Response) => {
+const verifyOtp = async (req: Request, res: Response) => {
   const { email, otp } = req.body;
   if (!email || !otp) {
     return res.status(400).json({ message: "Email and OTP are required" });
@@ -90,8 +89,8 @@ export const verifyOtp = async (req: Request, res: Response) => {
     }
 
     user.isVerified = true;
-    user.otp = null;
-    user.otpExpires = null;
+    user.otp = undefined;
+    user.otpExpires = undefined;
     await user.save();
 
     const SECRET = process.env.JWT_SECRET || "secret";
@@ -115,7 +114,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -152,7 +151,7 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserProfile = async (req: Request, res: Response) => {
+const getUserProfile = async (req: Request, res: Response) => {
   const userId = req.user?.id;
 
   if (!userId) {
@@ -172,8 +171,16 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const logoutUser = async (req: Request, res: Response) => {
+const logoutUser = async (req: Request, res: Response) => {
   return res.status(200).json({
     message: "User logged out successfully.",
   });
+};
+
+export {
+  registerUser,
+  verifyOtp,
+  loginUser,
+  getUserProfile,
+  logoutUser,
 };
