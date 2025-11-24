@@ -58,15 +58,24 @@ const updateBrand = async (req: Request, res: Response) => {
 
         const { name, logoUrl, isActive } = req.body;
 
-        if(name) {
+        if(name && name !== brand.name) {
             const slug = name.toLowerCase().replace(/\s+/g, "-");
+
             const existingBrand = await Brand.findOne({ $or: [ { name }, { slug }], _id: { $ne: brand._id } });
+
             if (existingBrand) {
                 return res.status(400).json({ message: "Another brand with this name or slug already exists."});
             }
-            await Brand.findByIdAndUpdate(brand._id, { name, slug, logoUrl, isActive }, { new: true });
-            return res.status(200).json({ message: "Brand updated successfully." });
+            brand.name = name;
+            brand.slug = slug;
         }
+
+        if(brand.logoUrl !== undefined) return brand.logoUrl = logoUrl;
+        if(isActive !== undefined) return brand.isActive = isActive;
+
+        await brand.save();
+
+        res.status(200).json({ message: "Brand updated successfully." });
     } catch (error) {
         res.status(500).json({ message : "Server Error, Please try again later."});
     }
