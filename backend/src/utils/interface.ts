@@ -1,134 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
-interface Logo {
-    type: 'url' | 'text';
-    url?: string;
-    value?: string;
-    alt?: string;
-}
+type role = 'user' | 'admin';
 
-interface Description {
-    text: string;
-}
+type addressType = 'home' | 'work' | 'other';
 
-interface SocialMediaLink {
-    platform: string;
-    url: string;
-    icon: string;
-}
+type PaymentMethod = 'credit_card' | 'paypal' | 'cash_on_delivery';
 
-interface QuickLink {
-    label: string;
-    url: string;
-}
+type PaymentStatus = 'pending' | 'completed' | 'failed';
 
-interface HelpInfo {
-    label: string;
-    url: string;
-}
+type OrderStatus = 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
-interface ContactInfo {
-    text: string;
-    link?: string;
-}
+type DiscountedBy = 'percentage' | 'fixed';
 
-export interface IFooter extends Document{
-    logo: Logo;
-    description: Description;
-    socialMediaLinks: SocialMediaLink[];
-    quickLinks: QuickLink[];
-    helpInfo: HelpInfo[];
-    contactInfo: ContactInfo[];
-}
-
-interface TopBarItem{
-        text: string;
-        link?: string;
-}
-
-interface MenuItem {
-    label: string;
-    path: string;
-}
-
-interface ActionIcon {
-    type: string;
-    icon: string;
-    route?: string;
-}
-
-interface Logo {
-    type: 'url' | 'text';
-    url?: string;
-    value?: string;
-    alt?: string;
-}
-
-export interface IHeader extends Document{
-    topBar: TopBarItem[];
-    menu: MenuItem[];
-    actionIcons: ActionIcon[];
-    logo: Logo;
-}
-
-
-interface SliderSection {
-    title: string;
-    shortDescription: string;
-    link?: string;
-    btnText?: string;
-    backgroundImageUrl: string;
-}
-
-interface Category {
-    name: string;
-    description?: string;
-    imageUrl: string;
-    link: string;
-}
-
-interface BestItems {
-    name: string;
-    imageUrl: string;
-    link: string;
-    price: number;
-}
-
-interface CustomerReviews {
-    customerName: string;
-    reviewText: string;
-    rating: number;
-}
-
-interface TrustBadge {
-    icon: string;
-    title: string;
-    shortText: string;
-}
-
-interface displayImage {
-    type: 'url' | 'text';
-    url?: string;
-    value?: string;
-    alt?: string;
-}
-
-interface ItemsSequence {
-    type: 'bestItems' | 'categories' | 'customerReviews' | 'trustBadges' | 'slider' | 'displayImage';
-    order: number;
-}
-
-export interface IHomeContent extends Document {
-    slider: SliderSection[];
-    categories: Category[];
-    bestItems: BestItems[];
-    customerReviews: CustomerReviews[];
-    trustBadges: TrustBadge[];
-    displayImage: displayImage;
-    itemsSequence?: ItemsSequence[];
-}
-
-export interface IUser {
+export interface IUser extends Document {
     name: string;
     email: string;
     password: string;
@@ -136,8 +20,9 @@ export interface IUser {
     isVerified: boolean;
     otp?: string;
     otpExpires?: Date;
-    role: 'user' | 'admin';
+    role: role;
 }
+
 
 export interface IAddress extends Document {
     user: mongoose.Types.ObjectId;
@@ -147,7 +32,101 @@ export interface IAddress extends Document {
     postalCode: string;
     phoneNumber: string;
     country: string;
-    type: 'home' | 'work' | 'other';
+    type: addressType;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface IWishList extends Document {
+    user: mongoose.Types.ObjectId;
+    products: mongoose.Types.ObjectId[];
+    note?: string;
+}
+
+export interface IReview extends Document {
+    product: mongoose.Types.ObjectId;
+    user?: mongoose.Types.ObjectId;
+    rating: number;
+    comment: string[];
+}
+
+export interface IProduct extends Document {
+    name: string;
+    description: string;
+    price: mongoose.Types.Decimal128;
+    salesPrice?: mongoose.Types.Decimal128;
+    discountPercentage: number;
+    category: mongoose.Types.ObjectId;
+    brand: mongoose.Types.ObjectId;
+    inStock: boolean;
+    images: string[];
+    thumbnail?: string;
+    stock: number;
+    isFeatured: boolean;
+    isDeleted: boolean;
+    averageRating: number;
+}
+
+
+export interface IOrderItem extends Document {
+    product: Schema.Types.ObjectId;
+    quantity: number;
+}
+
+
+export interface IOrder extends Document {
+    user: Schema.Types.ObjectId;
+    items: IOrderItem[];
+    address: Schema.Types.ObjectId;
+    paymentMethod: PaymentMethod;
+    paymentStatus: PaymentStatus;
+    totalAmount: mongoose.Types.Decimal128;
+    orderStatus: OrderStatus;
+}
+
+interface ICartItem  {
+    product: mongoose.Types.ObjectId;
+    quantity: number;
+}
+
+export interface ICart extends Document {
+    user: mongoose.Types.ObjectId;
+    items: ICartItem[];
+}
+
+export interface IBrand extends Document {
+    name: string;
+    slug: string;
+    logoUrl?: string;
+    isActive: boolean;
+}
+
+export interface ICategory extends Document {
+    name: string;
+    slug: string;
+    description: string;
+    imageUrl? : string;
+    isActive: boolean;
+}
+
+interface ICouponUsedBy {
+    userId: mongoose.Types.ObjectId;
+    usedAt: Date;
+}
+
+export interface ICoupon extends Document {
+    code: string;
+    discountType: DiscountedBy;
+    discountValue: number;
+    description?: string;
+    minPurchaseAmount?: mongoose.Types.Decimal128;
+    maxDiscount?: number;
+    validFrom: Date;
+    validUntil: Date;
+    isActive: boolean;
+    usageLimit?: number;
+    usedBy?: ICouponUsedBy[];
+    applicableCategories?: mongoose.Types.ObjectId[];
+    applicableProducts?: mongoose.Types.ObjectId[];
+    userLimit?: number;
 }
