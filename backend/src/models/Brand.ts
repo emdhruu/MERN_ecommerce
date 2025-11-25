@@ -1,13 +1,5 @@
-import mongoose, { Document, model } from "mongoose";
-
-const { Schema } = mongoose;
-
-interface IBrand extends Document {
-    name: string;
-    slug: string;
-    logoUrl?: string;
-    isActive: boolean;
-}
+import {Schema , model } from "mongoose";
+import { IBrand } from "../utils/interface";
 
 const brandSchema = new Schema<IBrand>({
     name: {

@@ -1,8 +1,7 @@
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
+import { IOrder } from "../utils/interface";
 
-const { Schema } = mongoose;
-
-const orderSchema = new Schema({
+const orderSchema = new Schema<IOrder>({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -32,7 +31,7 @@ const orderSchema = new Schema({
         enum: ['credit_card', 'paypal', 'cash_on_delivery'],
         required: true,
     },
-    payementStatus: {
+    paymentStatus: {
         type: String,
         enum: ['pending', 'completed', 'failed'],
         default: 'pending',
@@ -48,6 +47,6 @@ const orderSchema = new Schema({
     }
 }, { timestamps: true });
 
-const Order = model("Order", orderSchema);
+const Order = model<IOrder>("Order", orderSchema);
 
 export default Order;

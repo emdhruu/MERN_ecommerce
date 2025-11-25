@@ -1,23 +1,5 @@
-import mongoose, { Document, model } from "mongoose";
-
-const { Schema } = mongoose;
-
-interface IProduct extends Document {
-    name: string;
-    description: string;
-    price: mongoose.Types.Decimal128;
-    salesPrice?: mongoose.Types.Decimal128;
-    discountPercentage: number;
-    category: mongoose.Types.ObjectId;
-    brand: mongoose.Types.ObjectId;
-    inStock: boolean;
-    images: string[];
-    thumbnail?: string;
-    stock: number;
-    isFeatured: boolean;
-    isDeleted: boolean;
-    averageRating: number;
-}
+import mongoose, { model, Schema } from "mongoose";
+import { IProduct } from "../utils/interface";
 
 const productSchema = new Schema<IProduct>({
     name: {

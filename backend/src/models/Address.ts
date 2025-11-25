@@ -1,6 +1,5 @@
-import mongoose, { model } from "mongoose";
+import { Schema , model } from "mongoose";
 import { IAddress } from "../utils/interface";
-const { Schema } = mongoose;
 
 const AddressSchema = new Schema<IAddress>({
     user: {

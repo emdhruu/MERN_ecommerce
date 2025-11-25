@@ -1,16 +1,5 @@
-import mongoose, { model } from "mongoose";
-
-const { Schema } = mongoose;
-
-interface ICartItem {
-    product: mongoose.Types.ObjectId;
-    quantity: number;
-}
-
-interface ICart {
-    user: mongoose.Types.ObjectId;
-    items: ICartItem[];
-}
+import { model, Schema } from "mongoose";
+import { ICart } from "../utils/interface";
 
 const cartItemSchema = new Schema<ICart>({
     user: {

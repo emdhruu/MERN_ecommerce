@@ -1,12 +1,5 @@
-import mongoose, { Document, model } from "mongoose";
-
-const { Schema } = mongoose;
-
-interface IWishList extends Document {
-    user: mongoose.Types.ObjectId;
-    products: mongoose.Types.ObjectId[];
-    note?: string;
-}
+import { model, Schema } from "mongoose";
+import { IWishList } from "../utils/interface";
 
 const wishListSchema = new Schema<IWishList>({
     user: {
@@ -26,6 +19,6 @@ const wishListSchema = new Schema<IWishList>({
     }
 }, { timestamps: true });
 
-const WishList = model("WishList", wishListSchema);
+const WishList = model<IWishList>("WishList", wishListSchema);
 
 export default WishList;

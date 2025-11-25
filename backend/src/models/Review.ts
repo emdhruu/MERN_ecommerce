@@ -1,13 +1,5 @@
-import mongoose, { model } from "mongoose";
-
-const { Schema } = mongoose;
-
-interface IReview {
-    product: mongoose.Types.ObjectId;
-    user?: mongoose.Types.ObjectId;
-    rating: number;
-    comment: string[];
-}
+import { model, Schema } from "mongoose";
+import { IReview } from "../utils/interface";
 
 const reviewSchema = new Schema<IReview>({
     product: {

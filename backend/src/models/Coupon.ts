@@ -1,8 +1,7 @@
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
+import { ICoupon } from "../utils/interface";
 
-const { Schema } = mongoose;
-
-const couponSchema = new Schema({
+const couponSchema = new Schema<ICoupon>({
     code: {
         type: String,
         required: true,
@@ -75,6 +74,6 @@ const couponSchema = new Schema({
     },
 }, { timestamps: true });
 
-const Coupon = model("Coupon", couponSchema);
+const Coupon = model<ICoupon>("Coupon", couponSchema);
 
 export default Coupon;
