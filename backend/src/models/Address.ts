@@ -7,35 +7,41 @@ const AddressSchema = new Schema<IAddress>({
         ref: "User",
         required: true,
     },
-    street: {
-        type: String,
-        required: true,
-    },
-    city: {
-        type: String,
-        required: true,
-    },
-    state: {
-        type: String,
-        required: true,
-    },
-    postalCode: {
-        type: String,
-        required: true,
-    },
-    phoneNumber: {
-        type: String,
-        required: true,
-    },
-    country: {
-        type: String,
-        required: true,
-    },
-    type: {
-        type: String,
-        enum: ['home', 'work', 'other'],
-        default: 'home',
-    },
+    items: [{
+            street: {
+                type: String,
+                required: true,
+            },
+            city: {
+                type: String,
+                required: true,
+            },
+            state: {
+                type: String,
+                required: true,
+            },
+            postalCode: {
+                type: String,
+                required: true,
+            },
+            phoneNumber: {
+                type: String,
+                required: true,
+            },
+            country: {
+                type: String,
+                required: true,
+            },
+            type: {
+                type: String,
+                enum: ['home', 'work', 'other'],
+                default: 'home',
+            }, 
+            isDefault: {
+                type: Boolean,
+                default: false,
+            }
+        }]
 }, { timestamps: true })
 
 const Address = model<IAddress>("Address", AddressSchema);
