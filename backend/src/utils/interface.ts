@@ -23,9 +23,8 @@ export interface IUser extends Document {
     role: role;
 }
 
-
-export interface IAddress extends Document {
-    user: mongoose.Types.ObjectId;
+interface IAddressItem {
+    _id?: mongoose.Types.ObjectId;
     street: string;
     city: string;
     state: string;
@@ -33,8 +32,12 @@ export interface IAddress extends Document {
     phoneNumber: string;
     country: string;
     type: addressType;
-    createdAt: Date;
-    updatedAt: Date;
+    isDefault: boolean;
+}
+
+export interface IAddress extends Document {
+    user: mongoose.Types.ObjectId;
+    items: IAddressItem[];
 }
 
 export interface IWishList extends Document {
