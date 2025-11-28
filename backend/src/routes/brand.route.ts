@@ -15,4 +15,5 @@ router.get('/:slug', getBrandBySlug);
 router.put('/update/:id', isAdmin, updateBrand);
 
 router.delete('/delete/:id', isAdmin, deleteBrandById);
+
 export default router;
