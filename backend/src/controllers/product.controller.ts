@@ -51,7 +51,7 @@ const createProduct = async (req: Request, res: Response) => {
             discountPercentage: discountPercentage || 0,
             category,
             brand,
-            inStock:
+            inStock,
             images,
             thumbnail,
             stock,
