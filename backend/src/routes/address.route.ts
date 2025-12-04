@@ -1,19 +1,19 @@
-import express from 'express';
 import { AddAddressByUserId, DeleteAddressById, getUserAddressesByUserId, setDefaultAddressById, UpdateAddressById } from '../controllers/address.controller';
 import { authenticateToken } from '../middleware/auth';
+import { createRouter } from '../utils/createRouter';
 
-const router = express.Router();
+const router = createRouter();
 
 // Only authenticated users can manage their addresses
 
-router.post("/addAddress", authenticateToken, AddAddressByUserId);
+router.post("/add", authenticateToken, AddAddressByUserId);
 
-router.get("/getAddresses", authenticateToken, getUserAddressesByUserId);
+router.get("/getByUserId", authenticateToken, getUserAddressesByUserId);
 
-router.put("/updateAddress", authenticateToken, UpdateAddressById);
+router.put("/updateById", authenticateToken, UpdateAddressById);
 
-router.delete("/deleteAddress", authenticateToken, DeleteAddressById);
+router.delete("/deleteById", authenticateToken, DeleteAddressById);
 
-router.put("/setDefaultAddress", authenticateToken, setDefaultAddressById);
+router.put("/setDefaultById", authenticateToken, setDefaultAddressById);
 
 export default router;

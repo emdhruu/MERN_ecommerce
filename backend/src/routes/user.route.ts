@@ -1,8 +1,8 @@
-import express from "express";
 import { deleteByIdUser, getAllUsers, getByIdUser, updateByIdUser } from "../controllers/user.cotroller";
 import { isAdmin } from "../middleware/isAdmin";
+import { createRouter } from "../utils/createRouter";
 
-const router = express.Router();
+const router = createRouter();
 
 router.get("/usersList", isAdmin, getAllUsers);
 

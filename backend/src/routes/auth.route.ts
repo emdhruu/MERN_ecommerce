@@ -1,17 +1,12 @@
-import express from "express";
-import {
-    getUserProfile,
-  loginUser,
-  registerUser,
-  verifyOtp,
-} from "../controllers/auth.controller";
+import { getUserProfile, loginUser, registerUser, verifyOtp, } from "../controllers/auth.controller";
 import { authenticateToken } from "../middleware/auth";
+import { createRouter } from "../utils/createRouter";
 
-const router = express.Router();
+const router = createRouter();
 
 router.post("/register", registerUser);
 
-router.post("/verify-otp", verifyOtp);
+router.post("/verifyOtp", verifyOtp);
 
 router.post("/login", loginUser);
 
