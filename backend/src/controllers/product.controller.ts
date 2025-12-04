@@ -51,7 +51,7 @@ const createProduct = async (req: Request, res: Response) => {
             discountPercentage: discountPercentage || 0,
             category,
             brand,
-            inStock: stock > 0,
+            inStock:
             images,
             thumbnail,
             stock,
@@ -131,7 +131,7 @@ const getProductById = async (req : Request, res: Response) => {
     }
 }
 
-const updateProduct = async (req: Request, res: Response) => {
+const updateProductById = async (req: Request, res: Response) => {
     try {
         const productId = req.params.id;
         const updateData = req.body;
@@ -180,12 +180,15 @@ const updateProduct = async (req: Request, res: Response) => {
     }
 }
 
-const deleteProduct = async (req: Request, res: Response) => {
+const deleteProductById = async (req: Request, res: Response) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
+        const productId = req.params.id;
+        
+        const product = await Product.findByIdAndUpdate(productId, { isDeleted: true }, { new: true });
         if (!product) {
             return res.status(404).json({ message : "Product not found." });
         }
+
         return res.status(200).json({ message : "Product deleted successfully." });
     } catch (error: any) {
         res.status(500).json({ message : "Server error, Please try again later." });
@@ -206,7 +209,7 @@ const getFeaturedProducts = async (req: Request, res: Response) => {
     }
 }
 
-const updateProductStock = async (req: Request, res: Response) => {
+const updateProductStockById = async (req: Request, res: Response) => {
     try {
         const productId = req.params.id;
         const { stock } = req.body;
@@ -227,7 +230,7 @@ const updateProductStock = async (req: Request, res: Response) => {
     }
 }
 
-const updateFeaturedStatus = async (req: Request, res: Response) => {
+const updateFeaturedStatusById = async (req: Request, res: Response) => {
     try {
         const productId = req.params.id;
         const { isFeatured } = req.body;
@@ -246,4 +249,4 @@ const updateFeaturedStatus = async (req: Request, res: Response) => {
     }
 }
 
-export { createProduct, getAllProducts, getProductById , updateProduct, deleteProduct, getFeaturedProducts, updateProductStock, updateFeaturedStatus };
+export { createProduct, getAllProducts, getProductById , updateProductById, deleteProductById, getFeaturedProducts, updateProductStockById, updateFeaturedStatusById };
