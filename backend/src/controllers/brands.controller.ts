@@ -28,25 +28,28 @@ const createBrand = async (req: Request, res: Response) => {
 
 const getAllBrands = async (req: Request, res: Response) => {
     try {
-        
+        const brands = await Brand.find({ isActive: true }).sort({ createdAt : -1 });
+        res.status(200).json({ data: brands });
     } catch (error) {
-        
+        res.status(500).json({ message : "Server Error, Please try again later."})   
     }
-    const brands = await Brand.find({ isActive: true });
-    res.status(200).json(brands);
 }
 
 const getBrandBySlug = async (req: Request, res: Response) => {
-    const { slug } = req.params;
-    const brand = await Brand.findOne({ slug });
-
-    if(!brand) {
-        return res.status(404).json({ message: "Brand not found." });
-    } else if(!brand.isActive) {
-        res.status(403).json({ message : "This brand is inactive."});
+    try {    
+        const { slug } = req.params;
+        const brand = await Brand.findOne({ slug });
+        
+        if(!brand) {
+            return res.status(404).json({ message: "Brand not found." });
+        } else if(!brand.isActive) {
+            res.status(403).json({ message : "This brand is inactive."});
+        }
+        
+        return res.status(200).json(brand);
+    } catch (error) {
+        res.status(500).json({ message : "Server Error, Please try again later." })
     }
-
-    return res.status(200).json(brand);
 }
 
 const updateBrand = async (req: Request, res: Response) => {
