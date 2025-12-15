@@ -9,6 +9,11 @@ const couponSchema = new Schema<ICoupon>({
         uppercase: true,
         trim: true,
     },
+    type: {
+        type: String,
+        enum: ["cart", "category", "product"],
+        required: true,
+    },
     discountType: {
         type: String,
         enum: ['percentage', 'fixed'],
@@ -16,7 +21,6 @@ const couponSchema = new Schema<ICoupon>({
     },
     discountValue: {
         type: Number,
-        required: true,
     },
     description: {
         type: String,
@@ -30,19 +34,33 @@ const couponSchema = new Schema<ICoupon>({
     },
     validFrom: {
         type: Date,
-        required: true,
     },
     validUntil: {
         type: Date,
-        required: true,
     },
     isActive: {
         type: Boolean,
         default: true,
     },
+    applicableCategories: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Category",
+        }
+    ],
+    applicableProducts: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+        }
+    ],
     usageLimit: {
         type: Number,
         default: 0, // 0 = unlimited
+    },
+    userLimit:{
+        type: Number,
+        default: 1,
     },
     usedBy:[
         {
@@ -56,22 +74,6 @@ const couponSchema = new Schema<ICoupon>({
             }
         }
     ],
-    applicableCategories: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Category",
-        }
-    ],
-    applicableProducts: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Product",
-        }
-    ],
-    userLimit:{
-        type: Number,
-        default: 1,
-    },
 }, { timestamps: true });
 
 const Coupon = model<ICoupon>("Coupon", couponSchema);
