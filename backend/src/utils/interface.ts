@@ -117,8 +117,11 @@ interface ICouponUsedBy {
     usedAt: Date;
 }
 
+type CouponType = 'cart' | 'category' | 'product';
+
 export interface ICoupon extends Document {
     code: string;
+    type: CouponType;
     discountType: DiscountedBy;
     discountValue: number;
     description?: string;
