@@ -36,12 +36,12 @@ interface IAddressItem {
 }
 
 export interface IAddress extends Document {
-    user: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId | string;
     items: IAddressItem[];
 }
 
 export interface IWishList extends Document {
-    user: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId | string;
     products: mongoose.Types.ObjectId[];
     note?: string;
 }
@@ -113,7 +113,7 @@ export interface ICategory extends Document {
 }
 
 interface ICouponUsedBy {
-    userId: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId | string;
     usedAt: Date;
 }
 
@@ -131,7 +131,7 @@ export interface ICoupon extends Document {
     validUntil: Date;
     isActive: boolean;
     usageLimit?: number;
-    usedBy?: ICouponUsedBy[];
+    usedBy: ICouponUsedBy[];
     applicableCategories?: mongoose.Types.ObjectId[];
     applicableProducts?: mongoose.Types.ObjectId[];
     userLimit?: number;
