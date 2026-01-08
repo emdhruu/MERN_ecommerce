@@ -4,13 +4,17 @@ import { Toaster } from "react-hot-toast";
 import UserLayout from "./layout/UserLayout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/admin/Dashboard";
-import LoginPage from "./pages/LoginPage";
 import AdminRoute from "./routeGaurds/AdminRoute";
 import AdminLayout from "./layout/AdminLayout";
 import Product from "./pages/Product";
 import ProtectedRoute from "./routeGaurds/ProtectedRoute";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Login from "./features/auth/components/Login";
+import VerifyOtp from "./features/auth/components/VerifyOtp";
+import PendingVerificationRoute from "./routeGaurds/PendingVerificationRoute";
+import Register from "./features/auth/components/Register";
+import AuthLayout from "./layout/AuthLayout";
 
 function App() {
 
@@ -34,6 +38,10 @@ function App() {
         { 
           path: "checkout", 
           element: <ProtectedRoute><Checkout/></ProtectedRoute>
+        },
+        {
+          path: "verify-otp",
+          element: <PendingVerificationRoute><VerifyOtp/></PendingVerificationRoute>
         }
       ]
     },
@@ -52,8 +60,18 @@ function App() {
       ]
     },
     {
-      path: "/login",
-      element: <LoginPage/>
+      path: "/",
+      element: <AuthLayout/>,
+      children: [
+        {
+          path: "login",
+          element: <Login/>
+        },
+        {
+          path: "register",
+          element: <Register/>
+        }
+      ]
     },
     {
       path: "*",

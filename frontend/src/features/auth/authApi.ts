@@ -14,16 +14,16 @@ export const login = async (cred: {email: string, password: string}) => {
         const res = await api.post('/auth/login', cred);
         return res.data;
     } catch (error : any) {
-        throw error.response.message;
+        throw error.response.data.message;
     }
 }
 
-export const register = async (cred: {email: string, password: string, confirmPassword: string}) => {
+export const register = async (cred: {name:string, email: string, password: string}) => {
     try {
         const res = await api.post('/auth/register', cred);
-        return res;
+        return res.data;
     } catch (error : any) {
-        throw error.response.message;
+        throw error.response.data.message;
     }
 }
 

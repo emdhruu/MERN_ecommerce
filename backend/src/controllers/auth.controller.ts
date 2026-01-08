@@ -22,9 +22,9 @@ const generateOtp = () => {
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -38,9 +38,7 @@ const registerUser = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = generateOtp();
     const otpExpires = new Date(Date.now() + 2 * 60 * 1000); // OTP valid for 2 minutes
@@ -49,7 +47,6 @@ const registerUser = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
-      confirmPassword: hashedPassword,
       otp,
       otpExpires,
     });
@@ -131,9 +128,6 @@ const loginUser = async (req: Request, res: Response) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    if (!user[0].isVerified) {
-      return res.status(403).json({ message: "User not verified" });
-    }
     const SECRET = process.env.JWT_SECRET || "secret";
     const token = jwt.sign({ id: user[0]._id }, SECRET, { expiresIn: "1h" });
     res.status(200).json({
@@ -144,6 +138,7 @@ const loginUser = async (req: Request, res: Response) => {
         name: user[0].name,
         email: user[0].email,
         isVerified: user[0].isVerified,
+        role: user[0].role,
       },
     });
   } catch (error) {
@@ -160,7 +155,7 @@ const getUserProfile = async (req: Request, res: Response) => {
 
   try {
     const user = await User.findById(userId).select(
-      "-password -confirmPassword -otp -otpExpires"
+      "-password -otp -otpExpires"
     );
     if (!user) {
       return res.status(404).json({ message: "User not found" });

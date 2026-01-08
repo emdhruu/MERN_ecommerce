@@ -16,10 +16,6 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
-    confirmPassword: {
-      type: String,
-      required: true,
-    },
     isVerified: {
       type: Boolean,
       default: false,
