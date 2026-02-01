@@ -1,4 +1,3 @@
-import express from "express";
 import { createBrand, deleteBrandById, getAllBrands, getBrandBySlug, updateBrand } from "../controllers/brands.controller";
 import { isAdmin } from "../middleware/isAdmin";
 import { createRouter } from "../utils/createRouter";

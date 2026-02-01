@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthRequest } from "./auth";
+import { AuthRequest } from "./verifyingAccessToken";
 
 const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user){

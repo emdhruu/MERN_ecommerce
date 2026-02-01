@@ -21,6 +21,7 @@ export interface IUser extends Document {
     otp?: string;
     otpExpires?: Date;
     role: role;
+    refreshToken?: string[];
 }
 
 interface IAddressItem {

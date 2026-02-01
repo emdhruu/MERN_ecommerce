@@ -1,19 +1,19 @@
 import { AddAddressByUserId, DeleteAddressById, getUserAddressesByUserId, setDefaultAddressById, UpdateAddressById } from '../controllers/address.controller';
-import { authenticateToken } from '../middleware/auth';
+import { verifyingAccessToken } from '../middleware/verifyingAccessToken';
 import { createRouter } from '../utils/createRouter';
 
 const router = createRouter();
 
 // Only authenticated users can manage their addresses
 
-router.post("/add", authenticateToken, AddAddressByUserId);
+router.post("/add", verifyingAccessToken, AddAddressByUserId);
 
-router.get("/getByUserId", authenticateToken, getUserAddressesByUserId);
+router.get("/getByUserId", verifyingAccessToken, getUserAddressesByUserId);
 
-router.put("/updateById", authenticateToken, UpdateAddressById);
+router.put("/updateById", verifyingAccessToken, UpdateAddressById);
 
-router.delete("/deleteById", authenticateToken, DeleteAddressById);
+router.delete("/deleteById", verifyingAccessToken, DeleteAddressById);
 
-router.put("/setDefaultById", authenticateToken, setDefaultAddressById);
+router.put("/setDefaultById", verifyingAccessToken, setDefaultAddressById);
 
 export default router;

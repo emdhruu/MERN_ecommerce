@@ -63,8 +63,8 @@ const getByUserId = async (req: Request, res: Response) => {
         let limit = 0;
 
         if (req.params.page && req.params.limit ) {
-            const page  = req.params.page  ? parseInt(req.params.page)  : 1;
-            limit = req.params.limit ? parseInt(req.params.limit) : 10;
+            const page  = req.params.page  ? parseInt(req.params.page as string)  : 1;
+            limit = req.params.limit ? parseInt(req.params.limit as string) : 10;
             skip  = (page - 1) * limit;
         }
 

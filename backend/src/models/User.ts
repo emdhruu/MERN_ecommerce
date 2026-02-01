@@ -20,16 +20,14 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
-    otp: {
-      type: String,
-    },
-    otpExpires: {
-      type: Date,
-    },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
+    },
+    refreshToken: {
+      type: [String],
+      default: [],
     },
   },
   { timestamps: true }

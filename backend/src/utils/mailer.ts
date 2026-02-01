@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { VerificationTemplate } from '../template/verificationTemplate';
 
-export const sendOtp = async (email: string, otp: string) => {
+export const sendOtpViaMail = async (email: string, otp: string) => {
     try {
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -25,6 +25,5 @@ export const sendOtp = async (email: string, otp: string) => {
     } catch (error) {
         console.error("Error sending OTP:", error);
         throw new Error("Failed to send OTP");
-        
     }    
 }

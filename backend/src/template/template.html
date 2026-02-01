@@ -1,4 +1,4 @@
-export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,8 +11,17 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
       rel="stylesheet"
     />
   </head>
-  <body style=" margin: 0; font-family: 'Poppins', sans-serif; background: #ffffff; font-size: 14px;">
-    <div style="
+  <body
+    style="
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #ffffff;
+      font-size: 14px;
+    "
+  >
+
+    <div
+      style="
         max-width: 680px;
         margin: 0 auto;
         padding: 45px 30px 60px;
@@ -22,7 +31,9 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
         background-size: 800px 452px;
         background-position: top center;
         font-size: 14px;
-        color: #434343;">
+        color: #434343;
+      "
+    >
       <header>
         <table style="width: 100%;">
           <tbody>
@@ -31,12 +42,16 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
                 <h1 style="color: white; font-weight: lighter;">MERN-eKART</h1>
               </td>
               <td style="text-align: right;">
-                <span style="font-size: 16px; line-height: 30px; color: #ffffff;" id="todaysDate"></span>
+                <span
+                  style="font-size: 16px; line-height: 30px; color: #ffffff;" id="todaysDate"
+                  ></span
+                >
               </td>
             </tr>
           </tbody>
         </table>
       </header>
+
       <main>
         <div
           style="
@@ -45,14 +60,18 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
             padding: 92px 30px 115px;
             background: #ffffff;
             border-radius: 30px;
-            text-align: center; ">
+            text-align: center;
+          "
+        >
           <div style="width: 100%; max-width: 489px; margin: 0 auto;">
             <h1
               style="
                 margin: 0;
                 font-size: 24px;
                 font-weight: 500;
-                color: #1f1f1f;" >
+                color: #1f1f1f;
+              "
+            >
               Your OTP
             </h1>
             <p
@@ -63,7 +82,7 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
                 font-weight: 500;
               "
             >
-              Hey User,
+              Hey Tomy,
             </p>
             <p
               style="
@@ -84,14 +103,17 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
               style="
                 margin: 0;
                 margin-top: 60px;
-                font-size: 25px;
+                font-size: 40px;
                 font-weight: 600;
-                letter-spacing: 10px;
-                color: #ba3d4f;">
+                letter-spacing: 25px;
+                color: #ba3d4f;
+              "
+            >
               ${verificationCode}
             </p>
           </div>
         </div>
+
         <p
           style="
             max-width: 400px;
@@ -192,4 +214,3 @@ export const VerificationTemplate = (verificationCode: string) => `<!DOCTYPE htm
     </script>
   </body>
 </html>
-`
