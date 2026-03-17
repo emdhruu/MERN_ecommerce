@@ -4,7 +4,6 @@ import { Toaster } from "react-hot-toast";
 import UserLayout from "./layout/UserLayout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/admin/Dashboard";
-import AdminRoute from "./routeGaurds/AdminRoute";
 import AdminLayout from "./layout/AdminLayout";
 import Product from "./pages/Product";
 import ProtectedRoute from "./routeGaurds/ProtectedRoute";
@@ -12,9 +11,9 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Login from "./features/auth/components/Login";
 import VerifyOtp from "./features/auth/components/VerifyOtp";
-import PendingVerificationRoute from "./routeGaurds/PendingVerificationRoute";
 import Register from "./features/auth/components/Register";
 import AuthLayout from "./layout/AuthLayout";
+import Profile from "./features/profile/components/Profile";
 
 function App() {
 
@@ -33,24 +32,30 @@ function App() {
         },
         { 
           path: "cart", 
-          element: <ProtectedRoute><Cart/></ProtectedRoute>
+          element: <ProtectedRoute requireAuth requiredRole="user">
+                      <Cart/>
+                  </ProtectedRoute>
         },
         { 
           path: "checkout", 
-          element: <ProtectedRoute><Checkout/></ProtectedRoute>
+          element: <ProtectedRoute requireAuth requiredRole="user">
+                    <Checkout/>
+                  </ProtectedRoute>
         },
         {
-          path: "verify-otp",
-          element: <PendingVerificationRoute><VerifyOtp/></PendingVerificationRoute>
+          path: "profile",
+          element: <ProtectedRoute requireAuth requiredRole="user">
+                    <Profile/>
+                  </ProtectedRoute>
         }
       ]
     },
     {
       path: "/admin",
       element: (
-        <AdminRoute>
+        <ProtectedRoute requireAuth requiredRole="admin">
           <AdminLayout/>
-        </AdminRoute>
+        </ProtectedRoute>
       ),
       children: [
         {
@@ -74,12 +79,18 @@ function App() {
       ]
     },
     {
+      path: "verify-otp",
+      element: <ProtectedRoute requireAuth requireVerified>
+                <VerifyOtp/>
+              </ProtectedRoute>
+    },
+    {
       path: "*",
       element: <div>404 Not Found</div>
     }
   ]);
 
-  return <div>
+  return <div className="min-h-screen ">
     <RouterProvider router={router}/>
     <Toaster position="top-right" reverseOrder={false} />
   </div>;
