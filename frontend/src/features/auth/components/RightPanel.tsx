@@ -3,7 +3,7 @@ import online_shopping_bg from "../../../assets/online_shopping_bg.json";
 
 const RightPanel = () => {
   return (
-    <div className="w-1/2 bg-slate-100 h-full flex flex-col">
+    <div className="bg-slate-100 flex flex-col w-full h-full">
           <div className="flex-grow pt-28 ps-16 ">
             <p className="font-light text-3xl">Start Shopping Today</p>
             <div className="flex flex-col mt-8 font-light text-slate-500 text-sm">

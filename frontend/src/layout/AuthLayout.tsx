@@ -7,7 +7,9 @@ const AuthLayout = () => {
         {/* Left Panel */}
         <Outlet/>
         {/* Right Panel */}
-        <RightPanel/>
+        <div className="hidden md:block w-1/2 h-full">
+          <RightPanel/>
+        </div>
     </div>
   )
 }
