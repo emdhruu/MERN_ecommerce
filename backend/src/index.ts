@@ -12,8 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: "*", // fallback for development
-  credentials: true
+  origin: "http://localhost:5173", // fallback for development
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());
