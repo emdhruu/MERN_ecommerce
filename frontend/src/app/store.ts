@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { apiSlice } from "@/config/axios";
+import { apiSlice } from "@/app/apiSlice";
 import authSlice from "../features/auth/authSlice";
 
 export const store = configureStore({
