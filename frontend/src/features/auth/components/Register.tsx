@@ -32,7 +32,7 @@ const Register = () => {
    const onSubmit = async (data: FormsValue) => {
       try {
         const res = await registerUser(data).unwrap();
-        toast.success("Registration successful! Please check your email for the OTP.");
+        toast.success(res.data.message);
         reset();
         navigate("/verify-otp");
       } catch (error: any) {

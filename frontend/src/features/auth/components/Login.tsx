@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "../authApi";
 
-const Login = async () => {
+const Login = () => {
   type FormValues = {
     email: string,
     password: string
@@ -21,15 +21,15 @@ const Login = async () => {
 
   const onSubmit = async (data: FormValues) => {
    try {
-    const response = await login(data).unwrap();
+    const res = await login(data).unwrap();
 
-    toast.success("Login successful!");
+    toast.success(res.data.message);
     reset();
 
-    if (!response.user.isVerified) {
+    if (!res.user.isVerified) {
       navigate("/verify-otp");
     } else {
-      navigate(response.user.role === "admin" ? "/admin/dashboard" : "/profile"); 
+      navigate(res.user.role === "admin" ? "/admin/dashboard" : "/profile"); 
     }
    } catch (error: any) {
     toast.error(error?.data?.message || "Login failed. Please check your credentials and try again.");
