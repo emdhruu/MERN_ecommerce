@@ -23,7 +23,7 @@ const Login = () => {
    try {
     const res = await login(data).unwrap();
 
-    toast.success(res.data.message);
+    toast.success(res.message);
     reset();
 
     if (!res.user.isVerified) {
