@@ -11,7 +11,7 @@ const verifyingAccessToken = (
   next: NextFunction
 ) => {
   const authHeader = req.headers["authorization"];
-  if (!authHeader) return res.status(401).json({ message: "No authorization header provided" });
+  if (!authHeader) return res.status(403).json({ message: "No authorization header provided" });
   const token = authHeader.split(" ")[1];
   const ACCESS_TOKEN = process.env.JWT_ACCESS_TOKEN_SECRET;
   if (!ACCESS_TOKEN) {
@@ -20,7 +20,7 @@ const verifyingAccessToken = (
 
   jwt.verify(token, ACCESS_TOKEN, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ message: "Invalid or expired token" });
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
     req.user = decoded;
     next();

@@ -18,7 +18,7 @@ const baseQueryWithReauth : BaseQueryFn<string | FetchArgs, unknown, FetchBaseQu
     let result = await baseQuery(args, api, extraOptions)
     console.log(result);
     
-    if (result?.error?.status === 403) {
+    if (result?.error?.status === 401) {
         const refreshResult: any = await baseQuery('/auth/refresh', api, extraOptions);
         console.log(refreshResult);
         if (refreshResult?.data) {

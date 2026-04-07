@@ -150,7 +150,7 @@ const loginUser = async (req: Request, res: Response) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(403).json({ message: "Invalid password" });
     }
 
     if (!user.isVerified) {
@@ -202,7 +202,7 @@ const getUserProfile = async (req: Request, res: Response) => {
   const userId = req.user?.id;
 
   if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(403).json({ message: "Unauthorized" });
   }
 
   try {
