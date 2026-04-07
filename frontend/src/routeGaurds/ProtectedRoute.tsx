@@ -5,11 +5,11 @@ import { Navigate } from "react-router-dom";
 interface AuthRouteProps {
     children: ReactNode;
     requireAuth?: boolean;
-    requireVerified?: boolean;
+    requireUnVerified?: boolean;
     requiredRole?: string;
 }
 
-const ProtectedRoute = ({ children, requireAuth, requireVerified, requiredRole } : AuthRouteProps) => {
+const ProtectedRoute = ({ children, requireAuth, requireUnVerified, requiredRole } : AuthRouteProps) => {
     const { savedToken, loggedInUser } = useAppSelector(state => state.auth);
     console.log(loggedInUser);
     
@@ -17,14 +17,18 @@ const ProtectedRoute = ({ children, requireAuth, requireVerified, requiredRole }
         return <Navigate to="/login" replace />
     }
 
-    if (requireVerified && loggedInUser && !loggedInUser.isVerified) {
-        return <Navigate to="/verify-otp" replace />
+    if (requireUnVerified) {
+        if (!loggedInUser) {
+            return <Navigate to="/login" replace />
+        } else if (loggedInUser.isVerified) {
+            return <Navigate to={`/${loggedInUser.role === "admin" ? "admin/dashboard" : "profile"}`} replace />
+        }
     }
 
     console.log("loggedinuser",loggedInUser?.role);
     console.log("requiredrole", requiredRole);
     
-    if (requiredRole && loggedInUser && loggedInUser.role !== requiredRole) {
+    if (requiredRole && (!loggedInUser || loggedInUser.role !== requiredRole)) {
         return <Navigate to="/" replace />
     }
 
