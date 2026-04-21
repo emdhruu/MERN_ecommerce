@@ -43,6 +43,7 @@ const registerUser = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
+      role: "user",
     });
     
     const otpRequestResult = await OtpService.requestOtp(email);
@@ -59,6 +60,7 @@ const registerUser = async (req: Request, res: Response) => {
         name: newUser.name,
         email: newUser.email,
         isVerified: newUser.isVerified,
+        role: newUser.role,
       },
     });
   } catch (error) {
@@ -107,6 +109,7 @@ const verifyOtp = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         isVerified: user.isVerified,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -170,6 +173,7 @@ const loginUser = async (req: Request, res: Response) => {
           name: user.name,
           email: user.email,
           isVerified: user.isVerified,
+          role: user.role
         }
       })
     }

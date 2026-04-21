@@ -3,8 +3,8 @@ import { Response } from "express";
 export const saveCookie = ( res: Response, refreshToken : string) => {
     res.cookie(process.env.TOKEN_KEY as string, refreshToken, {   
         httpOnly: true,
-        secure: (process.env.NODE_ENV || 'development') === 'production',
-        sameSite: 'none',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000
     })
 }
@@ -12,8 +12,8 @@ export const saveCookie = ( res: Response, refreshToken : string) => {
 export const clearCookie = (res: Response) => {
     res.clearCookie(process.env.TOKEN_KEY as string, {
         httpOnly: true,
-        secure: (process.env.NODE_ENV || 'development') === 'production',
-        sameSite: 'none',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 0
     })
 }
