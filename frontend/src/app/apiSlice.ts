@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
-import { logout, setCredentials } from "@/features/auth/authSlice";
+import { logout, setAuthenticatedUser } from "@/features/auth/authSlice";
 import type { RootState } from "@/app/store";
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
-        const token =  (getState() as RootState).auth.savedToken;
+        const token =  (getState() as RootState).auth.accessToken;
         if(token) {
             headers.set("Authorization", `Bearer ${token}`);
         }
@@ -17,14 +17,18 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth : BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions)
     console.log(result);
+
+    const isRefreshCall = typeof args === "string" ? args.includes("/auth/refresh") : args.url.includes("/auth/refresh");
     
-    if (result?.error?.status === 401) {
+    if (result?.error?.status === 401 && !isRefreshCall) {
+
         const refreshResult: any = await baseQuery('/auth/refresh', api, extraOptions);
         console.log(refreshResult);
+
         if (refreshResult?.data) {
-            const user = (api.getState() as RootState).auth.loggedInUser;
+            const user = (api.getState() as RootState).auth.user;
             //storing the new token
-            api.dispatch(setCredentials({ ...refreshResult.data, user }));
+            api.dispatch(setAuthenticatedUser({ ...refreshResult.data, user }));
             //retrying the original query with new access token
             result = await baseQuery(args, api, extraOptions);
         } else {
@@ -35,6 +39,7 @@ const baseQueryWithReauth : BaseQueryFn<string | FetchArgs, unknown, FetchBaseQu
 }
 
 export const apiSlice = createApi({
+    reducerPath: "api",
     baseQuery: baseQueryWithReauth,
     endpoints: () => ({})
 })

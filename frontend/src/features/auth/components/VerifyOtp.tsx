@@ -2,8 +2,11 @@ import { useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useVerifyOtpMutation } from "../authApi";
+import { useAppSelector } from "@/app/hook";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-const correctOtp = "123456";
 const OtpLength = 6;
 
 const VerifyOtp = () => { 
@@ -11,26 +14,57 @@ const VerifyOtp = () => {
   const [otpError , setOtpError] = useState<string | null>(null);
   const [triggerShake , setTriggerShake] = useState<boolean>(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [verifyOtp , { isLoading }] = useVerifyOtpMutation();
+  const { user } = useAppSelector((state) => state.auth );
+  const navigate = useNavigate();
+  
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const triggerError = (message: string) => {
+    setOtpError(message);
+    setTriggerShake(false);
+    requestAnimationFrame(() => setTriggerShake(true))
+  }
+  
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const hasEmpty = otp.some((digit)=> digit === "");
-    
-    if (hasEmpty) {
+    if (hasEmpty) { 
       triggerError("Please enter all digits");
       return;
     }
 
     const otpValue = otp.join("");
-      
-    if (otpValue !== correctOtp) {
-      triggerError("Invalid OTP. Please try again.");
-      return;
-    }
+    console.log(user);
+    const { email } = user || {};
+    console.log("verify",email);
+    
+    try {
+      const res = await verifyOtp({
+        otp: otpValue,
+        email: email || ""
+      }).unwrap();
 
-    setOtpError(null);
-    console.log("OTP Entered: ", otpValue);
+      toast.success(res.message);
+      
+      if (!res.user.isVerified) {
+        navigate("/login");
+      } else {
+        navigate(res.user.role === "admin" ? "/admin/dashboard" : "/profile");
+      }
+    
+      setOtpError(null);
+
+      } catch (error: any) {
+      const errMessage = error?.data?.message || "OTP verification failed. Please try again.";
+      
+      if (error?.data?.remainingAttempts) {
+        triggerError(`${errMessage} You have ${error.data.remainingAttempts} attempts left.`);
+      } else {
+        triggerError(errMessage);
+      }
   }
+}
 
   const handleChange = (value: string, index: number)=> {
     setOtpError(null);
@@ -55,12 +89,6 @@ const VerifyOtp = () => {
     }
   }
 
-  const triggerError = (message: string) => {
-    setOtpError(message);
-    setTriggerShake(false);
-    requestAnimationFrame(() => setTriggerShake(true))
-  }
-
   return (
     <div className="h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-lg border-slate-400">
@@ -80,6 +108,7 @@ const VerifyOtp = () => {
                   value={digit}
                   ref={el => { if (el) inputsRef.current[index] = el; }}
                   inputMode="numeric"
+                  disabled={isLoading}
                   type="text"
                   autoComplete="one-time-code"
                   className={`w-12 text-center font-semibold text-3xl h-auto p-3 rounded-md ${otpError ? "border-red-400 focus-visible:ring-red-500" : "border-slate-300 focus-visible:ring-slate-600"}`}

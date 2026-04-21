@@ -1,5 +1,5 @@
 import { apiSlice } from "@/app/apiSlice";
-import { setCredentials, setUser } from "./authSlice";
+import { setAuthenticatedUser, setPendingUser } from "./authSlice";
 
 export const authApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -8,11 +8,22 @@ export const authApi = apiSlice.injectEndpoints({
                 url: '/auth/profile',
                 method: 'GET'
             }),
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            
+            async onQueryStarted(arg, { dispatch, queryFulfilled, getState }) {
                 try {
                     const { data } = await queryFulfilled;
-                    dispatch(setUser(data));
-                } catch (error) {}
+                    const currentState = getState() as any;
+                    const currentAccessToken = currentState.auth?.accessToken;
+                    
+                    dispatch(setAuthenticatedUser({ 
+                        user: data.data, 
+                        accessToken: currentAccessToken || '' 
+                    }));
+                } catch (error: any) {
+                    console.log("Auth check failed:", error);
+                    // Don't do anything on error - let the interceptor handle token refresh
+                    // If refresh also fails, it will logout automatically
+                }
             }
         }),
 
@@ -26,8 +37,14 @@ export const authApi = apiSlice.injectEndpoints({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    dispatch(setCredentials(data));
-                } catch (error) {}
+                    dispatch(setAuthenticatedUser(data));
+                } catch (error: any) {
+                    const errData = error?.error?.data;
+                        console.log(errData?.user, "in error coming");
+                    if (errData?.requiresVerification) {
+                        dispatch(setPendingUser({ user: errData.user }));
+                    }
+                }
             }
         }),
 
@@ -36,12 +53,24 @@ export const authApi = apiSlice.injectEndpoints({
                 url: '/auth/register',
                 method: 'POST',
                 body: cred
-            })
+            }),
+
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    console.log("at registeration data", data);
+                    dispatch(setPendingUser(data));
+                    
+                } catch (error: any) {
+                    const errData = error?.error?.data;
+                    console.log("err in register", errData);
+                }
+            }
         }),
 
         verifyOtp: builder.mutation({
             query: (cred: {email: string, otp: string}) => ({
-                url: '/auth/verify-otp',
+                url: '/auth/verifyOtp',
                 method: 'POST',
                 body: cred
             }),
@@ -49,8 +78,12 @@ export const authApi = apiSlice.injectEndpoints({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    dispatch(setCredentials(data));
-                } catch (error) {}
+                    console.log("data from verify otp", data);
+                    dispatch(setAuthenticatedUser(data));
+                } catch (error) {
+                    console.log("error in verfiy otp", error);
+                    
+                }
             }
         }),
 
@@ -65,6 +98,13 @@ export const authApi = apiSlice.injectEndpoints({
         logout: builder.mutation({
             query: () => ({
                 url: '/auth/logout',
+                method: 'POST'
+            })
+        }),
+
+        refresh: builder.mutation({
+            query: () => ({
+                url: '/auth/refresh',
                 method: 'POST'
             })
         })

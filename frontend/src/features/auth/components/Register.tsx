@@ -1,7 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useAppSelector } from "../../../app/hook";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,15 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useRegisterUserMutation } from "../authApi";
 
 const Register = () => {
-    const { loggedInUser} = useAppSelector((state)=> state.auth);
     const navigate = useNavigate();
     const [registerUser , { isLoading }] = useRegisterUserMutation();
-
-   useEffect(() => {
-     if (loggedInUser && !loggedInUser?.isVerified) {
-         navigate("/verify-otp");
-      }
-   }, [loggedInUser]);
 
     type FormsValue = {
         name: string, 
@@ -31,8 +22,10 @@ const Register = () => {
 
    const onSubmit = async (data: FormsValue) => {
       try {
+        console.log("registeration entered data",data);
+        
         const res = await registerUser(data).unwrap();
-        toast.success(res.data.message);
+        toast.success(res.message);
         reset();
         navigate("/verify-otp");
       } catch (error: any) {
@@ -42,11 +35,11 @@ const Register = () => {
 
     return (
       <div className="w-full md:w-1/2 h-full xl:px-40 lg:px-10 px-0 flex flex-col items-center md:items-start pt-28 gap-3 bg-white">
-        <Card className="w-full max-w-md border-0 shadow-none">
+        <Card className="w-full max-w-md border-0 shadow-none gap-0">
           <CardHeader>
             <CardTitle className="text-3xl font-semibold mb-4">Register</CardTitle>
             <CardDescription className="text-slate-500 font-light">
-              We will send you an <b className="text-slate-600">One Time Password</b> on a provided mobile number.
+              We will send you an <b className="text-slate-600">One Time Password</b> on a provided email address.
             </CardDescription>
           </CardHeader>
           <CardContent>

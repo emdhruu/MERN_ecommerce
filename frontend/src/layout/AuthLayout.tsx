@@ -3,11 +3,11 @@ import RightPanel from "../features/auth/components/RightPanel";
 
 const AuthLayout = () => {
   return (
-    <div className="h-screen flex">
+    <div className="min-h-screen flex">
         {/* Left Panel */}
         <Outlet/>
         {/* Right Panel */}
-        <div className="hidden md:block w-1/2 h-full">
+        <div className="hidden md:block w-1/2">
           <RightPanel/>
         </div>
     </div>

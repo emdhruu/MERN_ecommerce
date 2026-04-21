@@ -6,7 +6,6 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./layout/AdminLayout";
 import Product from "./pages/Product";
-import ProtectedRoute from "./routeGaurds/ProtectedRoute";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Login from "./features/auth/components/Login";
@@ -14,6 +13,10 @@ import VerifyOtp from "./features/auth/components/VerifyOtp";
 import Register from "./features/auth/components/Register";
 import AuthLayout from "./layout/AuthLayout";
 import Profile from "./features/profile/components/Profile";
+import AuthGard from "./routeGaurds/AuthGard";
+import VerificationGuard from "./routeGaurds/VerificationGuard";
+import RoleGuard from "./routeGaurds/RoleGuard";
+import AuthInitializer from "./features/auth/AuthInitialzer";
 
 function App() {
 
@@ -32,30 +35,38 @@ function App() {
         },
         { 
           path: "cart", 
-          element: <ProtectedRoute requireAuth requiredRole="user">
-                      <Cart/>
-                  </ProtectedRoute>
+          element: <AuthGard>
+                      <RoleGuard role="user">
+                        <Cart/>
+                      </RoleGuard>
+                    </AuthGard>
         },
         { 
           path: "checkout", 
-          element: <ProtectedRoute requireAuth requiredRole="user">
-                    <Checkout/>
-                  </ProtectedRoute>
+          element: <AuthGard>
+                      <RoleGuard role="user">
+                        <Checkout/>
+                      </RoleGuard>
+                    </AuthGard>
         },
         {
           path: "profile",
-          element: <ProtectedRoute requireAuth requiredRole="user">
-                    <Profile/>
-                  </ProtectedRoute>
-        }
+              element: <AuthGard>
+                          <RoleGuard role="user">
+                            <Profile/>
+                          </RoleGuard>
+                      </AuthGard>
+          }
       ]
     },
     {
       path: "/admin",
       element: (
-        <ProtectedRoute requireAuth requiredRole="admin">
-          <AdminLayout/>
-        </ProtectedRoute>
+        <AuthGard>
+          <RoleGuard role="admin">
+            <AdminLayout/>
+          </RoleGuard>
+        </AuthGard>
       ),
       children: [
         {
@@ -80,9 +91,9 @@ function App() {
     },
     {
       path: "verify-otp",
-      element: <ProtectedRoute requireAuth requireVerified>
-                <VerifyOtp/>
-              </ProtectedRoute>
+      element: <VerificationGuard>
+        <VerifyOtp/>
+      </VerificationGuard>
     },
     {
       path: "*",
@@ -91,8 +102,10 @@ function App() {
   ]);
 
   return <div className="min-h-screen ">
-    <RouterProvider router={router}/>
-    <Toaster position="top-right" reverseOrder={false} />
+    <AuthInitializer>
+      <RouterProvider router={router}/>
+      <Toaster position="top-right" reverseOrder={false} />
+    </AuthInitializer>
   </div>;
 }
 

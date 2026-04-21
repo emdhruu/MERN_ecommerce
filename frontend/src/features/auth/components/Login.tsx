@@ -1,6 +1,4 @@
-import { useAppSelector } from "../../../app/hook";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,35 +14,30 @@ const Login = () => {
   }
   const [login, { isLoading }] = useLoginMutation();
   const {register, handleSubmit, reset, formState: {errors}} = useForm<FormValues>();
-  const { loggedInUser } = useAppSelector((state)=> state.auth);
   const navigate = useNavigate();
+
 
   const onSubmit = async (data: FormValues) => {
    try {
     const res = await login(data).unwrap();
-
+    console.log("response", res);
+    
     toast.success(res.message);
     reset();
+    
+    res.user.isVerified ?? navigate(res.user.role === "admin" ? "/admin/dashboard" : "/profile");
+   
+  } catch (error: any) {
+    const errMessage = error?.data?.message || "Login failed. Please try again.";
 
-    if (!res.user.isVerified) {
+    if (error?.data?.requiresVerification) {
+      toast.error(errMessage);
       navigate("/verify-otp");
     } else {
-      navigate(res.user.role === "admin" ? "/admin/dashboard" : "/profile"); 
+      toast.error(errMessage);
     }
-   } catch (error: any) {
-    toast.error(error?.data?.message || "Login failed. Please check your credentials and try again.");
    }
   }
-
-  useEffect(() => {
-    if (loggedInUser){
-      if (!loggedInUser.isVerified ) {
-        navigate("/verify-otp");
-      } else {
-        navigate(loggedInUser.role === "admin" ? "/admin/dashboard" : "/profile");
-      }
-    }
-  }, [loggedInUser]);
 
   return (  
     <div className="w-full md:w-1/2 h-full xl:px-40 lg:px-10 px-0 flex flex-col items-center md:items-start pt-28 gap-3 bg-white">
@@ -66,7 +59,7 @@ const Login = () => {
               <Input
                 type="email"
                 id="email"
-                placeholder="Michealscott@gmail.com"
+                placeholder="for eg: Michealscott@gmail.com"
                 className="border-slate-200 rounded-sm w-full"
                 {...register("email", { 
                   required: "Email is required", 

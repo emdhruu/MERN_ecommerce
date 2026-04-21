@@ -10,25 +10,29 @@ interface AuthRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAuth, requireUnVerified, requiredRole } : AuthRouteProps) => {
-    const { savedToken, loggedInUser } = useAppSelector(state => state.auth);
-    console.log(loggedInUser);
+    const { user, status } = useAppSelector(state => state.auth);
+    console.log("user", user?.isVerified);
+    console.log("status in protected route", status);
     
-    if (requireAuth && !savedToken) {
+    
+    if (status === "idle" ) {
+        return null; // or a loading spinner
+    }
+
+    if (requireAuth && status !== "authenticated") {
         return <Navigate to="/login" replace />
     }
-
+    
     if (requireUnVerified) {
-        if (!loggedInUser) {
+        if (!user) {
             return <Navigate to="/login" replace />
-        } else if (loggedInUser.isVerified) {
-            return <Navigate to={`/${loggedInUser.role === "admin" ? "admin/dashboard" : "profile"}`} replace />
+        } 
+        if (status === "authenticated" && user?.isVerified) {
+            return <Navigate to={`/${user.role === "admin" ? "admin/dashboard" : "profile"}`} replace />
         }
     }
-
-    console.log("loggedinuser",loggedInUser?.role);
-    console.log("requiredrole", requiredRole);
     
-    if (requiredRole && (!loggedInUser || loggedInUser.role !== requiredRole)) {
+    if (requiredRole && (!user || user.role !== requiredRole)) {
         return <Navigate to="/" replace />
     }
 

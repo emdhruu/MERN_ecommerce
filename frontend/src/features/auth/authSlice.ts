@@ -8,16 +8,18 @@ interface User {
     isVerified: boolean;
 }
 
+type AuthState = "idle" | "pending" | "authenticated";
+
 interface AuthStore {
-    loggedInUser: User | null;
-    isAuthChecked: boolean;
-    savedToken: string | null;
+    user: User | null;
+    accessToken: string | null;
+    status: AuthState;
 }
 
 const initialState : AuthStore = {
-    loggedInUser: null,
-    isAuthChecked: false,
-    savedToken: localStorage.getItem("accessToken") || null,
+    user: null,
+    accessToken: null,
+    status: "idle",
 }
 
 const authSlice = createSlice({
@@ -25,25 +27,30 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
-            state.loggedInUser = null;
-            state.savedToken = null;
-            state.isAuthChecked = false;
-            localStorage.removeItem("accessToken");
+            state.user = null;
+            state.accessToken = null;
+            state.status = "idle";
         },
-        setCredentials: (state, action: PayloadAction<{ user: User; accessToken: string }>) => {
-            state.loggedInUser = action.payload.user;
-            state.savedToken = action.payload.accessToken;
-            localStorage.setItem("accessToken", action.payload.accessToken);
+        setAuthenticatedUser: (state, action: PayloadAction<{ user: User; accessToken: string }>) => {
+            state.user = action.payload.user;
+            state.accessToken = action.payload.accessToken;
+            state.status = "authenticated"
         },
-        setUser: (state, action: PayloadAction<User>) => {
-            state.loggedInUser = action.payload;
-            state.isAuthChecked = true;
+        setPendingUser: (state, action: PayloadAction<{ user: User }>) => {
+            state.user = action.payload.user;
+            state.accessToken = null;
+            state.status = "pending";
+        },
+        setResetState: (state) => {
+            state.user = null;
+            state.accessToken = null;
+            state.status = "idle";
         }
     },
 })
 
 // export const selectLoginStatus = (state: ) => state.auth.loginStatus;
 
-export const { logout, setCredentials, setUser } = authSlice.actions;
+export const { logout, setAuthenticatedUser, setPendingUser , setResetState } = authSlice.actions;
 
 export default authSlice.reducer;
