@@ -11,9 +11,9 @@ const createCategory = async(req: Request, res: Response) => {
             return res.status(400).json({ message : "This category is already exists in list." });
         }
 
-        new Categories({ newCategory })
+        const savedCategory = await Categories.create(newCategory);
 
-        res.status(200).json({ message : "Category added successfully" });
+        res.status(200).json({ message : "Category added successfully", data: savedCategory });
         
     } catch (error) {
         res.status(500).json({ message : "Server Error, Please try again later." });

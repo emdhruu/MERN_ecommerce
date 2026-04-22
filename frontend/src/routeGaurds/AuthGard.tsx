@@ -6,15 +6,14 @@ const AuthGard = ({ children }: { children: React.ReactNode}) => {
     console.log("Status in auth", status);
     console.log("user", user);
     
-    
     // If status is undefined or idle, redirect to login
-    if (status === "idle") {
+    if (!status || status === "idle") {
         return <Navigate to="/login" replace />;
     } 
 
     // If status is not authenticated, redirect to login
     if (status !== "authenticated") {
-        return <Navigate to="/login" replace />
+        return <Navigate to="/login" replace />;
     }
     
     return (
@@ -22,4 +21,4 @@ const AuthGard = ({ children }: { children: React.ReactNode}) => {
     )
 }
 
-export default AuthGard
+export default AuthGard;

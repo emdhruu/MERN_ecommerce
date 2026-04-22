@@ -25,7 +25,14 @@ const Login = () => {
     toast.success(res.message);
     reset();
     
-    res.user.isVerified ?? navigate(res.user.role === "admin" ? "/admin/dashboard" : "/profile");
+    // res.user.isVerified ?? navigate(res.user.role === "admin" ? "/admin/dashboard" : "/profile");
+      if (res.user.isVerified) {
+        if (res.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/profile");
+        }
+      }
    
   } catch (error: any) {
     const errMessage = error?.data?.message || "Login failed. Please try again.";
