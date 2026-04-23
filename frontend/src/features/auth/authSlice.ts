@@ -14,12 +14,14 @@ interface AuthStore {
     user: User | null;
     accessToken: string | null;
     status: AuthState;
+    isInitialized: boolean;
 }
 
 const initialState : AuthStore = {
     user: null,
     accessToken: null,
     status: "idle",
+    isInitialized: false,
 }
 
 const authSlice = createSlice({
@@ -34,7 +36,8 @@ const authSlice = createSlice({
         setAuthenticatedUser: (state, action: PayloadAction<{ user: User; accessToken: string }>) => {
             state.user = action.payload.user;
             state.accessToken = action.payload.accessToken;
-            state.status = "authenticated"
+            state.status = "authenticated";
+            state.isInitialized = true;
         },
         setPendingUser: (state, action: PayloadAction<{ user: User }>) => {
             state.user = action.payload.user;
@@ -45,12 +48,18 @@ const authSlice = createSlice({
             state.user = null;
             state.accessToken = null;
             state.status = "idle";
+        },
+        setAuthCheckComplete: (state) => {
+            // If no user was found, set to idle (not authenticated)
+            if (!state.user) {
+                state.isInitialized = false;
+            }
         }
     },
 })
 
 // export const selectLoginStatus = (state: ) => state.auth.loginStatus;
 
-export const { logout, setAuthenticatedUser, setPendingUser , setResetState } = authSlice.actions;
+export const { logout, setAuthenticatedUser, setPendingUser, setResetState, setAuthCheckComplete } = authSlice.actions;
 
 export default authSlice.reducer;

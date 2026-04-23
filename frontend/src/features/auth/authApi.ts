@@ -1,5 +1,6 @@
 import { apiSlice } from "@/app/apiSlice";
-import { setAuthenticatedUser, setPendingUser } from "./authSlice";
+//check
+import { setAuthenticatedUser, setPendingUser, setAuthCheckComplete } from "./authSlice";
 
 export const authApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -106,7 +107,18 @@ export const authApi = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/auth/refresh',
                 method: 'POST'
-            })
+            }),
+            //check
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    dispatch(setAuthenticatedUser(data));
+                } catch (error) {
+                    console.log("Refresh failed:", error);
+                    // If refresh fails, user is not authenticated
+                    dispatch(setAuthCheckComplete());
+                }
+            }
         })
     })
 });

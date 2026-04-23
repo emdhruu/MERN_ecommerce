@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
+
 const Cart = () => {
   return (
-    <div>Cart</div>
+    <div>Cart <Link to="/checkout">Go to Checkout</Link></div>
   )
 }
 

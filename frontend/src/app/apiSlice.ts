@@ -19,6 +19,7 @@ const baseQueryWithReauth : BaseQueryFn<string | FetchArgs, unknown, FetchBaseQu
     console.log(result);
 
     const isRefreshCall = typeof args === "string" ? args.includes("/auth/refresh") : args.url.includes("/auth/refresh");
+    console.log(isRefreshCall);
     
     if (result?.error?.status === 401 && !isRefreshCall) {
 
@@ -27,11 +28,17 @@ const baseQueryWithReauth : BaseQueryFn<string | FetchArgs, unknown, FetchBaseQu
 
         if (refreshResult?.data) {
             const user = (api.getState() as RootState).auth.user;
+            console.log(user);
+            console.log(refreshResult.data);
+            
+            
             //storing the new token
-            api.dispatch(setAuthenticatedUser({ ...refreshResult.data, user }));
+            api.dispatch(setAuthenticatedUser(refreshResult.data));
             //retrying the original query with new access token
             result = await baseQuery(args, api, extraOptions);
         } else {
+            console.log("logout is called here ");
+            
             api.dispatch(logout());
         }
     }
