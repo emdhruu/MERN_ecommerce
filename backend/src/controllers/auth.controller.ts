@@ -317,6 +317,7 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 
     res.status(200).json({
       accessToken: newAccessToken,
+      user: foundUser
     });
 
   } catch (error) {
