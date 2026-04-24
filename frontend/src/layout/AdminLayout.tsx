@@ -1,6 +1,12 @@
+import Sidebar from "@/features/adminPanel/components/Sidebar";
+import { Outlet } from "react-router-dom";
+
 const AdminLayout = () => {
   return (
-    <div>AdminLayout</div>
+    <div>
+      <Sidebar/>
+      <Outlet/>
+    </div>
   )
 }
 

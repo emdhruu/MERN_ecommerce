@@ -17,6 +17,13 @@ import AuthGard from "./routeGaurds/AuthGard";
 import VerificationGuard from "./routeGaurds/VerificationGuard";
 import RoleGuard from "./routeGaurds/RoleGuard";
 import AuthInitializer from "./features/auth/AuthInitialzer";
+import ProductManagement from "./pages/admin/ProductManagement";
+import Inventory from "./pages/admin/Inventory";
+import Users from "./pages/admin/Users";
+import Settings from "./pages/admin/Settings";
+import Categories from "./pages/admin/Categories";
+import Orders from "./pages/admin/Orders";
+import Coupons from "./pages/admin/Coupons";
 
 function App() {
 
@@ -72,6 +79,34 @@ function App() {
         {
           path: "dashboard",
           element: <Dashboard/>
+        },
+        {
+          path: "productManagement",
+          element: <ProductManagement/>
+        },
+        {
+          path: "inventory",
+          element: <Inventory/>
+        },
+        {
+          path: "users",
+          element: <Users/>
+        },
+        {
+          path: "settings",
+          element: <Settings/>
+        },
+        {
+          path: "categories",
+          element: <Categories/>
+        },
+        {
+          path: "orders",
+          element: <Orders/>
+        },
+        {
+          path: "coupons",
+          element: <Coupons/>
         }
       ]
     },
