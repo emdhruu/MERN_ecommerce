@@ -9,6 +9,14 @@ import reviewRoutes from "./review.route";
 import cartRoutes from "./cart.route";
 import wishListRoutes from "./wishlist.route";
 import userRoutes from "./user.route";
+import inventoryRoutes from "./inventory.route";
+import inventoryLedgerRoutes from "./inventoryLedger.route";
+import purchaseOrderRoutes from "./purchaseOrder.route";
+import dashboardRoutes from "./dashboard.route";
+import settingsRoutes from "./settings.route";
+import invoiceRoutes from "./invoice.route";
+import taxRoutes from "./tax.route";
+import chargeRoutes from "./charge.route";
 import { createRouter } from "../utils/createRouter";
 
 const router = createRouter();
@@ -34,5 +42,21 @@ router.use("/cart", cartRoutes);
 router.use("/wishlist", wishListRoutes);
 
 router.use("/user", userRoutes);
+
+router.use("/inventory", inventoryRoutes);
+
+router.use("/inventory-ledger", inventoryLedgerRoutes);
+
+router.use("/purchase-orders", purchaseOrderRoutes);
+
+router.use("/admin/dashboard", dashboardRoutes);
+
+router.use("/settings", settingsRoutes);
+
+router.use("/invoices", invoiceRoutes);
+
+router.use("/tax", taxRoutes);
+
+router.use("/charges", chargeRoutes);
 
 export default router;

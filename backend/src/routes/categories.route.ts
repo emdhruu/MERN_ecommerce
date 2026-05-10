@@ -1,5 +1,6 @@
 import { createCategory, deleteCategory, getAllCategory, getCategoryById, isActiveUpdate, updateCategory } from "../controllers/category.controller";
 import { isAdmin } from "../middleware/isAdmin";
+import { verifyingAccessToken } from "../middleware/verifyingAccessToken";
 import { createRouter } from "../utils/createRouter";
 
 const router = createRouter();
@@ -12,12 +13,12 @@ router.get("/getById", getCategoryById);
 
 // this is only accessible to Admin Role
 
-router.post("/create", isAdmin, createCategory);
+router.post("/create", verifyingAccessToken, isAdmin, createCategory);
 
-router.put("/update", isAdmin, updateCategory);
+router.put("/update",verifyingAccessToken, isAdmin, updateCategory);
 
-router.delete("/delete", isAdmin, deleteCategory);
+router.delete("/delete",verifyingAccessToken, isAdmin, deleteCategory);
 
-router.put("/isActiveUpdate", isAdmin, isActiveUpdate);
+router.put("/isActiveUpdate", verifyingAccessToken, isAdmin, isActiveUpdate);
 
 export default router;

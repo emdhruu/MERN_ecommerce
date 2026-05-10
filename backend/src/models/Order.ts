@@ -1,7 +1,6 @@
 import mongoose, { model, Schema } from "mongoose";
-import { IOrder } from "../utils/interface";
 
-const orderSchema = new Schema<IOrder>({
+const orderSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -19,6 +18,10 @@ const orderSchema = new Schema<IOrder>({
                 required: true,
                 default: 1,
             },
+            price: {
+                type: mongoose.Types.Decimal128,
+                required: true,
+            }
         }
     ],
     address: {
@@ -28,25 +31,45 @@ const orderSchema = new Schema<IOrder>({
     },
     paymentMethod: {
         type: String,
-        enum: ['credit_card', 'paypal', 'cash_on_delivery'],
+        enum: ["credit_card", "paypal", "cash_on_delivery"],
         required: true,
     },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'completed', 'failed'],
-        default: 'pending',
+        enum: ["pending", "completed", "failed"],
+        default: "pending",
+    },
+    transactionId: {
+        type: String,
+        default: null
     },
     totalAmount: {
         type: mongoose.Types.Decimal128,
         required: true,
     },
+    subtotal: {
+        type: mongoose.Types.Decimal128,
+        default: 0,
+    },
+    couponCode: {
+        type: String,
+        default: null,
+    },
+    discount: {
+        type: mongoose.Types.Decimal128,
+        default: 0,
+    },
     orderStatus: {
         type: String,
-        enum: ['processing', 'shipped', 'delivered', 'cancelled'],
-        default: 'processing',
+        enum: ["PENDING", "PAYMENT_PENDING", "CONFIRMED", "CANCELLED", "FAILED", "DELIVERED"],
+        default: "PENDING",
     }
 }, { timestamps: true });
 
-const Order = model<IOrder>("Order", orderSchema);
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ orderStatus: 1 });
+orderSchema.index({ paymentStatus: 1 });
+
+const Order = model("Order", orderSchema);
 
 export default Order;

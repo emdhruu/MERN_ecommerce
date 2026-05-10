@@ -1,14 +1,15 @@
 import { addToCart, clearCartItems, getCart, updateCartQuantity } from "../controllers/cart.controller";
+import { verifyingAccessToken } from "../middleware/verifyingAccessToken";
 import { createRouter } from "../utils/createRouter";
 
 const router = createRouter();
 
-router.get("/getCart", getCart);
+router.get("/getCart", verifyingAccessToken, getCart);
 
-router.post("/addToCart", addToCart);
+router.post("/addToCart", verifyingAccessToken, addToCart);
 
-router.put("/updateQuantity", updateCartQuantity);
+router.put("/updateQuantity", verifyingAccessToken, updateCartQuantity);
 
-router.delete("/deleteCartItems", clearCartItems);
+router.delete("/deleteCartItems", verifyingAccessToken, clearCartItems);
 
 export default router;

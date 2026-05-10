@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Categories from "../models/Categories";
 import Brand from "../models/Brand";
 import Product from "../models/Product";
+import Inventory from "../models/Inventory";
 
 const createProduct = async (req: Request, res: Response) => {
     try {
@@ -20,6 +21,8 @@ const createProduct = async (req: Request, res: Response) => {
             isFeatured,
             isDeleted
         } = req.body;
+        console.log("product body", req.body);
+        
 
         const categoryExits = await Categories.findById(category);
         const brandExits = await Brand.findById(brand);
@@ -59,8 +62,25 @@ const createProduct = async (req: Request, res: Response) => {
             isDeleted: isDeleted || false
         })
 
+        // Auto-create inventory record for the new product
+        await Inventory.findOneAndUpdate(
+            { productId: product._id },
+            {
+                $setOnInsert: {
+                    productId: product._id,
+                    availableStock: stock || 0,
+                    reservedStock: 0,
+                    totalStock: stock || 0,
+                    lowStockThreshold: 10
+                }
+            },
+            { upsert: true }
+        );
+
         return res.status(201).json({ message : "Product created successfully.", data: product });
     } catch (error: any) {
+        console.log(error);
+        
         res.status(500).json({ message : "Server error, Please try again later." });
     }
 }
@@ -75,11 +95,11 @@ const getAllProducts = async (req: Request, res: Response) => {
 
         //filter by category
         if (req.query.category) {
-            filter.category = { $in: req.query.category };
+            filter.category = req.query.category;
         }
         //filter by brand
         if (req.query.brand) {
-            filter.brand = { $in: req.query.brand };
+            filter.brand = req.query.brand;
         }
         //search filter (optional)
         if (req.query.search ) {
@@ -109,9 +129,11 @@ const getAllProducts = async (req: Request, res: Response) => {
         res.set("X-Total-Pages", totalPages.toString());
         res.set("X-Current-Page", page.toString());
 
-        return res.status(200).json({ page, limit, data: products  });
+        return res.status(200).json({ page, limit, total, totalPages, data: products  });
 
     } catch (error: any) {
+        console.log("error in product list calling", error);
+        
         res.status(500).json({ message : "Server error, Please try again later." });
     }
 }

@@ -35,6 +35,8 @@ const Login = () => {
       }
    
   } catch (error: any) {
+    console.log(error);
+    
     const errMessage = error?.data?.message || "Login failed. Please try again.";
 
     if (error?.data?.requiresVerification) {
@@ -102,6 +104,12 @@ const Login = () => {
             Don't have an account?{" "}
             <Link to="/register" className="text-[#D54F47] font-semibold hover:underline hover:cursor-pointer">
               Register
+            </Link>
+          </p>
+          <p className="text-sm font-light">
+            Back to{" "}
+            <Link to="/" className="text-[#D54F47] font-semibold hover:underline hover:cursor-pointer">
+              Home
             </Link>
           </p>
         </CardContent>

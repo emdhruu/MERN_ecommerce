@@ -1,6 +1,5 @@
 import { apiSlice } from "@/app/apiSlice";
-//check
-import { setAuthenticatedUser, setPendingUser, setAuthCheckComplete } from "./authSlice";
+import { setAuthenticatedUser, setPendingUser, logout } from "./authSlice";
 
 export const authApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -21,9 +20,6 @@ export const authApi = apiSlice.injectEndpoints({
                         accessToken: currentAccessToken || '' 
                     }));
                 } catch (error: any) {
-                    console.log("Auth check failed:", error);
-                    // Don't do anything on error - let the interceptor handle token refresh
-                    // If refresh also fails, it will logout automatically
                 }
             }
         }),
@@ -41,7 +37,6 @@ export const authApi = apiSlice.injectEndpoints({
                     dispatch(setAuthenticatedUser(data));
                 } catch (error: any) {
                     const errData = error?.error?.data;
-                        console.log(errData?.user, "in error coming");
                     if (errData?.requiresVerification) {
                         dispatch(setPendingUser({ user: errData.user }));
                     }
@@ -59,12 +54,9 @@ export const authApi = apiSlice.injectEndpoints({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    console.log("at registeration data", data);
                     dispatch(setPendingUser(data));
                     
                 } catch (error: any) {
-                    const errData = error?.error?.data;
-                    console.log("err in register", errData);
                 }
             }
         }),
@@ -79,11 +71,8 @@ export const authApi = apiSlice.injectEndpoints({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    console.log("data from verify otp", data);
                     dispatch(setAuthenticatedUser(data));
                 } catch (error) {
-                    console.log("error in verfiy otp", error);
-                    
                 }
             }
         }),
@@ -100,7 +89,14 @@ export const authApi = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/auth/logout',
                 method: 'POST'
-            })
+            }),
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    dispatch(logout());
+                    await queryFulfilled;
+                } catch (error) {
+                }
+            }
         }),
 
         refresh: builder.mutation({
@@ -108,18 +104,31 @@ export const authApi = apiSlice.injectEndpoints({
                 url: '/auth/refresh',
                 method: 'POST'
             }),
-            //check
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setAuthenticatedUser(data));
                 } catch (error) {
-                    console.log("Refresh failed:", error);
-                    // If refresh fails, user is not authenticated
-                    dispatch(setAuthCheckComplete());
+                    dispatch(logout());
                 }
             }
-        })
+        }),
+
+        updateProfile: builder.mutation({
+            query: (body: { name: string }) => ({
+                url: '/auth/updateProfile',
+                method: 'PUT',
+                body
+            }),
+        }),
+
+        changePassword: builder.mutation({
+            query: (body: { currentPassword: string; newPassword: string }) => ({
+                url: '/auth/changePassword',
+                method: 'PUT',
+                body
+            }),
+        }),
     })
 });
 
@@ -129,5 +138,7 @@ export const {
     useRegisterUserMutation,
     useVerifyOtpMutation,
     useResendOtpMutation,
-    useLogoutMutation
+    useLogoutMutation,
+    useUpdateProfileMutation,
+    useChangePasswordMutation,
 } = authApi;

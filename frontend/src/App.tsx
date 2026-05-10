@@ -3,6 +3,7 @@ import "./index.css";
 import { Toaster } from "react-hot-toast";
 import UserLayout from "./layout/UserLayout";
 import Home from "./pages/Home";
+import ProductsList from "./pages/ProductsList";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./layout/AdminLayout";
 import Product from "./pages/Product";
@@ -22,8 +23,13 @@ import Inventory from "./pages/admin/Inventory";
 import Users from "./pages/admin/Users";
 import Settings from "./pages/admin/Settings";
 import Categories from "./pages/admin/Categories";
+import Brands from "./pages/admin/Brands";
 import Orders from "./pages/admin/Orders";
 import Coupons from "./pages/admin/Coupons";
+import PurchaseOrders from "./pages/admin/PurchaseOrders";
+import InventoryLedger from "./pages/admin/InventoryLedger";
+import Invoices from "./pages/admin/Invoices";
+import Configuration from "./pages/admin/Configuration";
 
 function App() {
 
@@ -35,6 +41,10 @@ function App() {
         { 
           index: true, 
           element: <Home/> 
+        },
+        {
+          path: "products",
+          element: <ProductsList/>
         },
         { 
           path: "product/:id", 
@@ -101,12 +111,32 @@ function App() {
           element: <Categories/>
         },
         {
+          path: "brands",
+          element: <Brands/>
+        },
+        {
           path: "orders",
           element: <Orders/>
         },
         {
           path: "coupons",
           element: <Coupons/>
+        },
+        {
+          path: "inventory/purchase-orders",
+          element: <PurchaseOrders/>
+        },
+        {
+          path: "inventory/ledger",
+          element: <InventoryLedger/>
+        },
+        {
+          path: "invoices",
+          element: <Invoices/>
+        },
+        {
+          path: "configuration",
+          element: <Configuration/>
         }
       ]
     },

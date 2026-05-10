@@ -103,8 +103,8 @@ const getAllCoupons = async (req: Request, res: Response) => {
 
 const toggleCouponStatus = async (req: Request, res: Response) => {
     try {
-        const couponId = req.body;
-        const coupon = await Coupon.findById(couponId);
+        const { _id } = req.body;
+        const coupon = await Coupon.findById(_id);
         if (!coupon){
             return res.status(404).json({ message: "Coupon not found." });
         }
@@ -149,8 +149,8 @@ const updateCoupon = async (req: Request, res: Response) => {
 
 const deleteCoupon = async (req: Request, res: Response) => {
     try {
-        const couponId = req.body;
-        const coupon = await Coupon.findByIdAndDelete(couponId);
+        const { _id } = req.body;
+        const coupon = await Coupon.findByIdAndDelete(_id);
         if (!coupon){
             return res.status(404).json({ message: "Coupon not found." });
         }

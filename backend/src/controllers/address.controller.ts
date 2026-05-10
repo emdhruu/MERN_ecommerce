@@ -29,7 +29,7 @@ const getUserAddressesByUserId = async (req: Request, res: Response) => {
         const addresses = await Address.findOne({ user: userId });
 
         if (!addresses) {
-            return res.status(404).json({ message: "No addresses found for this user" });
+            return res.status(200).json({ message: "No addresses found for this user", data: { user: userId, items: [] } });
         }
 
         res.status(200).json({ message: "Addresses fetched successfully", data: addresses });

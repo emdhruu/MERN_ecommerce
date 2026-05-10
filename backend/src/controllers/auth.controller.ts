@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import OtpService from "../redis/otp.service";
-import { generateAccessToken, generateRefreshToken, hashToken } from "../utils/tokenHelper";
+import { generateAccessToken, generateRefreshToken } from "../utils/tokenHelper";
 import { clearCookie, saveCookie } from "../utils/cookieUtils";
 
 // Extend Express Request interface to include 'user'
@@ -95,7 +95,7 @@ const verifyOtp = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken({ id: user._id });
     const refreshToken = generateRefreshToken({ id: user._id, email: user.email });
 
-    user.refreshToken?.push(hashToken(refreshToken));
+    user.refreshToken?.push(refreshToken);
 
     await user.save();
 
@@ -181,7 +181,7 @@ const loginUser = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken({ id: user._id });
     const refreshToken = generateRefreshToken({ id: user._id, email: user.email });
 
-    user.refreshToken?.push(hashToken(refreshToken));
+    user.refreshToken?.push(refreshToken);
 
     await user.save();
 
@@ -230,9 +230,7 @@ const logoutUser = async (req: Request, res: Response) => {
 
     const refreshToken = cookies[process.env.TOKEN_KEY as string];
 
-    const hashedToken = hashToken(refreshToken);
-    
-    const user = await User.findOne({ refreshToken: hashedToken });
+    const user = await User.findOne({ refreshToken });
     
     if (!user || !user.refreshToken) {
       clearCookie(res);
@@ -241,7 +239,7 @@ const logoutUser = async (req: Request, res: Response) => {
 
     let matchedIndex = -1;
     for (let i = 0; i < user.refreshToken?.length; i++){
-     if (hashedToken === user.refreshToken[i]) {
+     if (refreshToken === user.refreshToken[i]) {
         matchedIndex = i;
         break;
       }
@@ -271,8 +269,6 @@ const handleRefreshToken = async (req: Request, res: Response) => {
 
     const refreshToken = cookies?.[process.env.TOKEN_KEY as string];
     
-    const hashedToken = hashToken(refreshToken);
-    // Use promisified version of jwt.verify
     let decoded;
     try {
       decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SECRET as string);
@@ -281,55 +277,130 @@ const handleRefreshToken = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Forbidden" });
     }
     
-    const foundUser = await User.findById((decoded as any).id).exec();
-    
-    if (!foundUser || !foundUser.refreshToken) {
+    const foundUser = await User.findOneAndUpdate(
+      {
+        _id: (decoded as any).id,
+        refreshToken: refreshToken
+      },
+      {
+        $pull: { refreshToken: refreshToken }
+      },
+      { new: true }
+    );
+
+    if (!foundUser) {
       clearCookie(res);
-      return res.status(403).json({ message : "Forbidden" });
+      return res.status(403).json({ message: "Forbidden - Token already used" });
     }
-
-    let matchedIndex = -1;
-
-    for(let i = 0; i < foundUser.refreshToken.length; i++){
-      if (hashedToken === foundUser.refreshToken[i]) {
-        matchedIndex = i;
-        break;
-      }
-    }
-
-    if (matchedIndex === -1) {
-      foundUser.refreshToken = [];
-      await foundUser.save();
-      clearCookie(res);
-      return res.status(403).json({ message : "Forbidden" });
-    }
-
-    foundUser.refreshToken.splice(matchedIndex, 1);
 
     const newAccessToken = generateAccessToken({ id: foundUser._id });
     const newRefreshToken = generateRefreshToken({ id: foundUser._id, email: foundUser.email });
 
-    foundUser.refreshToken.push(hashToken(newRefreshToken));
+    const validTokens = (foundUser.refreshToken || []).filter((token: string) => {
+      try {
+        jwt.verify(token, process.env.JWT_REFRESH_TOKEN_SECRET as string);
+        return true;
+      } catch {
+        return false;
+      }
+    });
 
-    await foundUser.save();
+    await User.findByIdAndUpdate(
+      foundUser._id,
+      { refreshToken: [...validTokens, newRefreshToken] }
+    );
 
     saveCookie(res, newRefreshToken);
 
     res.status(200).json({
       accessToken: newAccessToken,
-      user: foundUser
+      user: {
+        id: foundUser._id,
+        name: foundUser.name,
+        email: foundUser.email,
+        isVerified: foundUser.isVerified,
+        role: foundUser.role,
+      }
     });
 
   } catch (error) {
+    console.error('Refresh token error:', error);
     res.status(500).json({ message: "Error refreshing token" });
   }
 }
+
+const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: "Name is required." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name: name.trim() },
+      { new: true }
+    ).select("-password -otp -otpExpires -refreshToken");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({ message: "Profile updated successfully.", data: user });
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating profile." });
+  }
+};
+
+const changePassword = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current password and new password are required." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect." });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully." });
+  } catch (error) {
+    return res.status(500).json({ message: "Error changing password." });
+  }
+};
 
 export {
   registerUser,
   verifyOtp,
   loginUser,
   getUserProfile,
+  updateProfile,
+  changePassword,
   logoutUser,
   resendOtp,
   handleRefreshToken

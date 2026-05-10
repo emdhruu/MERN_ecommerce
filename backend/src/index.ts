@@ -5,6 +5,7 @@ import { connectDb } from './config/db';
 import routes from './routes/routes';
 import redisClientService from './redis/redisClient.service';
 import cookieParser from 'cookie-parser';
+import { initCronJobs } from './utils/cronJobs';
 
 dotenv.config();
 
@@ -26,5 +27,6 @@ app.use('/api', routes);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   connectDb();
+  initCronJobs();
   redisClientService.initializeRedisClient();
 });

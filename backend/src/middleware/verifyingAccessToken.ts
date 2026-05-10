@@ -1,8 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import User from "../models/User";
 
 export interface AuthRequest extends Request {
   user?: any;
+}
+
+interface IJwtPayload extends JwtPayload {
+  id : string;
 }
 
 const verifyingAccessToken = (
@@ -18,11 +23,12 @@ const verifyingAccessToken = (
     return res.status(500).json({ message: "Access token secret is not defined" });
   }
 
-  jwt.verify(token, ACCESS_TOKEN, (err, decoded) => {
+  jwt.verify(token, ACCESS_TOKEN, async (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: "Invalid or expired token" });
     }
-    req.user = decoded;
+    const payload = decoded as IJwtPayload;
+    req.user = await User.findById(payload?.id);
     next();
   });
 };

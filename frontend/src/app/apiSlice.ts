@@ -2,51 +2,95 @@ import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type Fetch
 import { logout, setAuthenticatedUser } from "@/features/auth/authSlice";
 import type { RootState } from "@/app/store";
 
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: boolean) => void;
+}> = [];
+
+const processQueue = (success: boolean) => {
+  failedQueue.forEach((prom) => {
+    prom.resolve(success);
+  });
+  failedQueue = [];
+};
+
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL,
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
-        const token =  (getState() as RootState).auth.accessToken;
-        if(token) {
+        const token = (getState() as RootState).auth.accessToken;
+        if (token) {
             headers.set("Authorization", `Bearer ${token}`);
         }
         return headers;
     }
 }); 
 
-const baseQueryWithReauth : BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
-    let result = await baseQuery(args, api, extraOptions)
-    console.log(result);
+const baseQueryWithReauth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
 
-    const isRefreshCall = typeof args === "string" ? args.includes("/auth/refresh") : args.url.includes("/auth/refresh");
-    console.log(isRefreshCall);
-    
-    if (result?.error?.status === 401 && !isRefreshCall) {
+  const isRefreshCall =
+    typeof args === "string"
+      ? args.includes("/auth/refresh")
+      : args.url?.includes("/auth/refresh");
 
-        const refreshResult: any = await baseQuery('/auth/refresh', api, extraOptions);
-        console.log(refreshResult);
+  let result = await baseQuery(args, api, extraOptions);
 
-        if (refreshResult?.data) {
-            const user = (api.getState() as RootState).auth.user;
-            console.log(user);
-            console.log(refreshResult.data);
-            
-            
-            //storing the new token
-            api.dispatch(setAuthenticatedUser(refreshResult.data));
-            //retrying the original query with new access token
-            result = await baseQuery(args, api, extraOptions);
-        } else {
-            console.log("logout is called here ");
-            
-            api.dispatch(logout());
-        }
+  if ((result?.error?.status === 401 || result?.error?.status === 403) && !isRefreshCall) {
+
+    if (isRefreshing) {
+      const success = await new Promise<boolean>((resolve) => {
+        failedQueue.push({ resolve });
+      });
+
+      if (success) {
+        return await baseQuery(args, api, extraOptions);
+      }
+      return result;
     }
-    return result;
-}
+
+    isRefreshing = true;
+
+    try {
+      const refreshResult: any = await baseQuery(
+        '/auth/refresh',
+        api,
+        extraOptions
+      );
+
+      if (refreshResult?.data) {
+        api.dispatch(
+          setAuthenticatedUser({
+            accessToken: refreshResult.data.accessToken,
+            user: refreshResult.data.user,
+          })
+        );
+
+        processQueue(true);
+        return await baseQuery(args, api, extraOptions);
+      } else {
+        api.dispatch(logout());
+        processQueue(false);
+        return result;
+      }
+    } catch (err) {
+      api.dispatch(logout());
+      processQueue(false);
+      return result;
+    } finally {
+      isRefreshing = false;
+    }
+  }
+
+  return result;
+};
 
 export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithReauth,
+    tagTypes: ["PurchaseOrder", "Inventory", "Cart"],
     endpoints: () => ({})
 })
