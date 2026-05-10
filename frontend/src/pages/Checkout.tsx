@@ -2,16 +2,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MapPin, Plus, Tag } from "lucide-react";
-import { useGetCartQuery, useGetUserAddressesQuery, useAddAddressMutation, useCreateOrderMutation, useClearCartMutation, useApplyCouponMutation } from "@/features/store/storeApi";
+import { useGetCartQuery, useGetUserAddressesQuery, useAddAddressMutation, useCreateOrderMutation, useClearCartMutation, useApplyCouponMutation, useCreatePaymentOrderMutation, useVerifyPaymentMutation, useConfirmPaymentMutation } from "@/features/store/storeApi";
+import { useAppSelector } from "@/app/hook";
 import toast from "react-hot-toast";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.auth.user);
   const { data: cartData, isLoading: loadingCart } = useGetCartQuery();
   const { data: addressData, isLoading: loadingAddr, refetch: refetchAddr } = useGetUserAddressesQuery();
   const [createOrder, { isLoading: isOrdering }] = useCreateOrderMutation();
   const [clearCart] = useClearCartMutation();
   const [addAddress, { isLoading: isAddingAddr }] = useAddAddressMutation();
+  const [createPaymentOrder] = useCreatePaymentOrderMutation();
+  const [verifyPayment] = useVerifyPaymentMutation();
+  const [confirmPayment] = useConfirmPaymentMutation();
 
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
@@ -76,10 +81,58 @@ const Checkout = () => {
     }));
 
     try {
-      await createOrder({ items, address: selectedAddress, paymentMethod, couponCode: couponResult?.couponDetails?.code || undefined }).unwrap();
-      toast.success("Order placed successfully!");
-      await clearCart().unwrap();
-      navigate("/profile");
+      const orderResult = await createOrder({ items, address: selectedAddress, paymentMethod, couponCode: couponResult?.couponDetails?.code || undefined }).unwrap();
+      const orderId = orderResult.data._id;
+
+      if (paymentMethod === "cash_on_delivery") {
+        await confirmPayment({ orderId }).unwrap();
+        toast.success("Order placed successfully!");
+        await clearCart().unwrap();
+        navigate("/profile");
+        return;
+      }
+
+      const paymentData = await createPaymentOrder({ orderId }).unwrap();
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        name: "MERN-eKART",
+        description: `Order #${orderId.slice(-8).toUpperCase()}`,
+        order_id: paymentData.razorpayOrderId,
+        handler: async (response: any) => {
+          try {
+            const verifyResult = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId,
+            }).unwrap();
+
+            await confirmPayment({ orderId, transactionId: verifyResult.transactionId }).unwrap();
+            toast.success("Payment successful! Order confirmed.");
+            await clearCart().unwrap();
+            navigate("/profile");
+          } catch (err: any) {
+            toast.error(err?.data?.message || "Payment verification failed.");
+          }
+        },
+        prefill: {
+          name: user?.name || "",
+          email: user?.email || "",
+        },
+        theme: { color: "#D54F47" },
+        modal: {
+          ondismiss: () => {
+            toast.error("Payment cancelled. Your order is saved — you can retry from your profile.");
+          },
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to place order.");
     }
@@ -179,8 +232,7 @@ const Checkout = () => {
             <div className="space-y-3">
               {[
                 { value: "cash_on_delivery", label: "Cash on Delivery" },
-                { value: "credit_card", label: "Credit Card (Pay Later)" },
-                { value: "paypal", label: "PayPal (Pay Later)" },
+                { value: "razorpay", label: "Pay Online (Card / UPI / Netbanking)" },
               ].map((method) => (
                 <label
                   key={method.value}

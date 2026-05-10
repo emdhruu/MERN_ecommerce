@@ -24,7 +24,8 @@
     "mongoose": "^8.16.4",
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.7",
-    "object-hash": "^3.0.0"
+    "object-hash": "^3.0.0",
+    "razorpay": "^2.9.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

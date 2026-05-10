@@ -214,6 +214,30 @@ export const storeApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    createPaymentOrder: builder.mutation<{ razorpayOrderId: string; amount: number; currency: string; orderId: string }, { orderId: string }>({
+      query: (body) => ({
+        url: "/payment/create-order",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    verifyPayment: builder.mutation<{ message: string; transactionId: string }, { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string; orderId: string }>({
+      query: (body) => ({
+        url: "/payment/verify",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    confirmPayment: builder.mutation<{ message: string; data: any }, { orderId: string; transactionId?: string }>({
+      query: ({ orderId, transactionId }) => ({
+        url: `/order/confirmPayment/${orderId}`,
+        method: "PUT",
+        body: { transactionId },
+      }),
+    }),
+
     getMyOrders: builder.query<{ page: number; limit: number; total: number; totalPages: number; data: UserOrder[] }, { page?: number; limit?: number }>({
       query: ({ page = 1, limit = 10 }) => `/order/myOrders?page=${page}&limit=${limit}`,
     }),
@@ -269,6 +293,9 @@ export const {
   useSetDefaultAddressMutation,
   useDeleteAddressMutation,
   useCreateOrderMutation,
+  useCreatePaymentOrderMutation,
+  useVerifyPaymentMutation,
+  useConfirmPaymentMutation,
   useGetMyOrdersQuery,
   useGetProductReviewsQuery,
   useAddReviewMutation,

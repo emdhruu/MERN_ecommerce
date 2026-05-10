@@ -17,6 +17,7 @@ import settingsRoutes from "./settings.route";
 import invoiceRoutes from "./invoice.route";
 import taxRoutes from "./tax.route";
 import chargeRoutes from "./charge.route";
+import paymentRoutes from "./payment.route";
 import { createRouter } from "../utils/createRouter";
 
 const router = createRouter();
@@ -58,5 +59,7 @@ router.use("/invoices", invoiceRoutes);
 router.use("/tax", taxRoutes);
 
 router.use("/charges", chargeRoutes);
+
+router.use("/payment", paymentRoutes);
 
 export default router;
