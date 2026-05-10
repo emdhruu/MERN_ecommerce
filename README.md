@@ -12,6 +12,7 @@ Full-stack e-commerce application with admin panel and customer storefront.
 - JWT access/refresh token rotation with multi-device support
 - Email OTP verification with Redis-backed cooldown and lockout
 - Role-based access control (user/admin) with middleware chain
+- Razorpay payment integration with order creation, signature verification, and confirmation
 - Transactional order creation with atomic inventory reservation (MongoDB sessions)
 - Full order lifecycle: Reserve > Payment > Confirm/Cancel with stock rollback
 - Inventory ledger with audit trail (IN, OUT, RESERVE, RELEASE, ADJUST)
@@ -30,7 +31,7 @@ Full-stack e-commerce application with admin panel and customer storefront.
 
 React SPA with two layouts: customer storefront and admin panel.
 
-**Storefront:** Product listing with filters/sort/search, product detail, cart with quantity management, checkout with address selection and coupon application, order history with detail dialog, user profile with address CRUD, product reviews.
+**Storefront:** Product listing with filters/sort/search, product detail, cart with quantity management, checkout with address selection and coupon application, order history with detail dialog, user profile with address CRUD, product reviews. Integration of razorpay for order type "razorpay" while in test mode. 
 
 **Admin Panel:** Dashboard with revenue charts, product/category/brand management, order management with status actions and invoice generation, inventory with stock operations, purchase orders with GRN flow, inventory ledger with per-product PDF reports, coupons, invoices (PDF/CSV download), user management, tax and charges configuration, store settings, notification preferences.
 
@@ -69,4 +70,13 @@ REDIS_URL=
 EMAIL_USER=
 EMAIL_PASS=
 TOKEN_KEY=
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+```
+
+## Environment Variables (frontend/.env)
+
+```
+VITE_API_URL=http://localhost:3000/api
+VITE_RAZORPAY_KEY_ID=
 ```
