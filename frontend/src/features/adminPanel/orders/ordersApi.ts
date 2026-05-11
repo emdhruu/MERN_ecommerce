@@ -26,7 +26,10 @@ export interface Order {
   paymentStatus: "pending" | "completed" | "failed";
   transactionId?: string;
   totalAmount: { $numberDecimal: string } | number;
+  subtotal: { $numberDecimal: string } | number;
+  discount: { $numberDecimal: string } | number;
   orderStatus: "PENDING" | "PAYMENT_PENDING" | "CONFIRMED" | "CANCELLED" | "FAILED" | "DELIVERED";
+  couponCode: string;
   createdAt: string;
   updatedAt: string;
 }

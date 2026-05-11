@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/app/hook";
 import { useEffect, useRef } from "react";
 import { authApi } from "./authApi";
-import { logout } from "./authSlice";
 
 const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
     const dispatch = useAppDispatch();

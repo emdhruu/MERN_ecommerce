@@ -62,7 +62,6 @@ const ProductFormDialog = ({
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<ProductFormData>();
 

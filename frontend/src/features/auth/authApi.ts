@@ -9,7 +9,7 @@ export const authApi = apiSlice.injectEndpoints({
                 method: 'GET'
             }),
             
-            async onQueryStarted(arg, { dispatch, queryFulfilled, getState }) {
+            async onQueryStarted(_args, { dispatch, queryFulfilled, getState }) {
                 try {
                     const { data } = await queryFulfilled;
                     const currentState = getState() as any;
@@ -31,7 +31,7 @@ export const authApi = apiSlice.injectEndpoints({
                 body: cred
             }),
 
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setAuthenticatedUser(data));
@@ -51,7 +51,7 @@ export const authApi = apiSlice.injectEndpoints({
                 body: cred
             }),
 
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setPendingUser(data));
@@ -68,7 +68,7 @@ export const authApi = apiSlice.injectEndpoints({
                 body: cred
             }),
 
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setAuthenticatedUser(data));
@@ -90,7 +90,7 @@ export const authApi = apiSlice.injectEndpoints({
                 url: '/auth/logout',
                 method: 'POST'
             }),
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     dispatch(logout());
                     await queryFulfilled;
@@ -104,7 +104,7 @@ export const authApi = apiSlice.injectEndpoints({
                 url: '/auth/refresh',
                 method: 'POST'
             }),
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setAuthenticatedUser(data));

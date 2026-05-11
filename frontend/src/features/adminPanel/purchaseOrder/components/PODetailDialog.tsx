@@ -20,7 +20,7 @@ interface PODetailDialogProps {
   onGrnSuccess: () => void;
 }
 
-const PODetailDialog = ({ purchaseOrderId, onClose, onGrnSuccess }: PODetailDialogProps) => {
+const PODetailDialog = ({ purchaseOrderId, onClose }: PODetailDialogProps) => {
   const { data, isLoading } = useGetPurchaseOrderByIdQuery(purchaseOrderId);
   const [receiveGoods, { isLoading: isReceiving }] = useReceiveGoodsMutation();
   const [createPurchaseInvoice, { isLoading: isGeneratingInvoice }] = useCreatePurchaseInvoiceMutation();
