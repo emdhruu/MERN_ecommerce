@@ -50,14 +50,14 @@ npm install
 npm run dev
 ```
 
-## Login Credentials
+<!-- ## Login Credentials
 
 After running seed:
 
 | Role  | Email                | Password |
 | ----- | -------------------- | -------- |
 | Admin | admin@mern-ekart.com | admin123 |
-| User  | user@mern-ekart.com  | user1234 |
+| User  | user@mern-ekart.com  | user1234 | -->
 
 ## Environment Variables (backend/.env)
 
